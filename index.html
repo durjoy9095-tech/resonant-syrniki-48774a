@@ -1,0 +1,5143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lifetime Health Record</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#eef5fb;
+  color:#172033;
+}
+
+button,input,select,textarea{font:inherit}
+button{
+  cursor:pointer;
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  font-weight:700;
+}
+
+.hidden{display:none!important}
+
+.header{
+  background:linear-gradient(135deg,#0874d8,#13a9e8);
+  color:#fff;
+  padding:18px 16px;
+  position:relative;
+}
+
+.header h1{margin:0 48px;font-size:22px}
+.notificationBtn{position:absolute;left:12px;top:14px;z-index:60;border:0;background:#ffffff25;color:#fff;font-size:22px;cursor:pointer;padding:6px 9px;border-radius:10px;line-height:1}.notificationBtn:hover{background:#ffffff38}
+.notificationBtn:hover{background:rgba(127,127,127,.12)}
+.notificationBadge{position:absolute;top:-1px;right:-1px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.9)}
+.notificationPanel{position:fixed;top:68px;left:10px;width:min(390px,calc(100vw - 20px));max-height:70vh;overflow:auto;z-index:2000;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.notificationItem{padding:13px;border-radius:12px;background:rgba(127,127,127,.08);margin:9px 0}
+.notificationItem.unread{border-left:4px solid #2563eb;background:rgba(37,99,235,.08)}
+
+.header small{opacity:.9}
+
+.menuBtn{
+  position:absolute;
+  right:12px;
+  top:14px;
+  background:#ffffff25;
+  color:#fff;
+  font-size:24px;
+  padding:4px 12px;
+}
+
+.menu{
+  position:absolute;
+  right:12px;
+  top:60px;
+  background:#fff;
+  color:#172033;
+  width:230px;
+  border-radius:12px;
+  box-shadow:0 8px 25px #0003;
+  z-index:50;
+  padding:8px;
+}
+
+.menu button{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:#fff;
+  margin:2px 0;
+}
+
+.menu button:hover{background:#eef6ff}
+
+.container{
+  width:94%;
+  max-width:1050px;
+  margin:18px auto;
+}
+
+.card{
+  background:#fff;
+  border-radius:15px;
+  padding:18px;
+  margin:15px 0;
+  box-shadow:0 4px 15px #00000012;
+}
+
+h2{
+  color:#0871d8;
+  margin:0 0 14px;
+}
+
+.sub{
+  color:#68768a;
+  font-size:13px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.full{grid-column:1/-1}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  border:1px solid #cbd7e5;
+  border-radius:8px;
+  background:#fff;
+}
+
+textarea{
+  min-height:75px;
+  resize:vertical;
+}
+
+.primary{background:#0877df;color:#fff}
+.success{background:#10a66a;color:#fff}
+.danger{background:#e44343;color:#fff}
+.secondary{background:#e8eef5;color:#172033}
+
+.auth{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:linear-gradient(135deg,#e5f4ff,#fff);
+}
+
+.authbox{
+  width:100%;
+  max-width:500px;
+  background:#fff;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 8px 30px #0002;
+}
+
+.authbox h1{
+  text-align:center;
+  color:#0871d8;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-bottom:18px;
+}
+
+.tabs button{background:#e8eef5}
+.tabs .active{
+  background:#0877df;
+  color:#fff;
+}
+
+.gender{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.gender label{
+  border:2px solid #dce5ef;
+  padding:14px;
+  border-radius:10px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.gender input{display:none}
+
+.gender .chosen{
+  border-color:#0877df;
+  background:#eaf5ff;
+  color:#0871d8;
+}
+
+.notice{
+  padding:11px;
+  border-radius:9px;
+  background:#edf7ff;
+  font-size:13px;
+  margin:10px 0;
+}
+
+.profile{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.profile div{
+  background:#f5f9fd;
+  padding:12px;
+  border-radius:9px;
+}
+
+.profile b{
+  display:block;
+  color:#0871d8;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.dashBtn{
+  background:#fff;
+  min-height:95px;
+  box-shadow:0 4px 14px #00000012;
+  text-align:left;
+  border:1px solid #e0e9f2;
+}
+
+.dashBtn strong{
+  display:block;
+  color:#0871d8;
+  font-size:15px;
+}
+
+.dashBtn span{
+  display:block;
+  color:#718096;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.section{display:none}
+.rxPreview,.rxGallery{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.rxThumb,.rxSavedThumb{width:110px;height:110px;object-fit:cover;border-radius:12px;border:1px solid #ddd}.rxSavedThumb{cursor:pointer}.rxItem{padding:14px;margin:12px 0;border:1px solid rgba(127,127,127,.2);border-radius:14px}.rxViewer{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}.rxViewerInner{position:relative;max-width:95vw;max-height:95vh}.rxViewerInner img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:12px}.rxClose{position:absolute;right:0;top:-48px}
+.section.open{display:block}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.record{
+  background:#f5f8fc;
+  border-radius:9px;
+  padding:10px;
+  margin-top:8px;
+  font-size:13px;
+}
+
+.med{
+  border:1px solid #d8e4ef;
+  background:#f8fbff;
+  border-radius:12px;
+  padding:14px;
+  margin:10px 0;
+}
+
+.medtitle{
+  font-weight:700;
+  color:#0871d8;
+  margin-bottom:10px;
+}
+
+.medgrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.take{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#eef8ff;
+  padding:10px;
+  border-radius:8px;
+  margin-top:10px;
+}
+
+.take input{
+  width:20px;
+  height:20px;
+}
+
+.badge{
+  padding:4px 8px;
+  border-radius:14px;
+  font-size:11px;
+}
+
+.ok{
+  background:#d8f5e6;
+  color:#08734b;
+}
+
+.wait{
+  background:#ffe1e1;
+  color:#b51d1d;
+}
+
+.homeInfoGrid{
+  margin-top:18px;
+}
+
+.infoCard h3{
+  margin-top:0;
+  margin-bottom:10px;
+}
+
+.infoCard p{
+  line-height:1.65;
+}
+
+.infoCard ul{
+  margin:8px 0 0 20px;
+  padding:0;
+}
+
+.infoCard li{
+  margin:8px 0;
+  line-height:1.55;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.stat{
+  background:#fff;
+  padding:14px;
+  text-align:center;
+  border-radius:12px;
+  box-shadow:0 3px 12px #0000000e;
+}
+
+.stat b{
+  display:block;
+  color:#0871d8;
+  font-size:22px;
+}
+
+.stat span{
+  font-size:11px;
+  color:#718096;
+}
+
+.calhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:14px 0;
+}
+
+.calTitle{
+  font-weight:700;
+  color:#0871d8;
+}
+
+.week,.days{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+}
+
+.week div{
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  padding:6px;
+}
+
+.day{
+  min-height:42px;
+  background:#f4f7fb;
+  border-radius:7px;
+  padding:6px;
+  font-size:12px;
+}
+
+.today{border:2px solid #0877df}
+
+.eventday{
+  background:#dff7eb;
+  color:#08764c;
+  font-weight:700;
+}
+
+.periodday{
+  background:#ffe0e8;
+  color:#c3224a;
+  font-weight:700;
+}
+
+.pregday{
+  background:#eadfff;
+  color:#6640b2;
+  font-weight:700;
+}
+
+.toast{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  background:#172033;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:9px;
+  display:none;
+  z-index:100;
+}
+
+/* Smooth UI */
+
+html{scroll-behavior:smooth}
+
+body{
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+
+*{
+  transition:
+    background-color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease,
+    opacity .18s ease;
+}
+
+button{
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    background-color .18s ease;
+}
+
+button:active{transform:scale(.97)}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline:3px solid rgba(8,119,223,.18);
+  outline-offset:1px;
+}
+
+input,select,textarea{
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background-color .18s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#0877df;
+  box-shadow:0 0 0 4px rgba(8,119,223,.08);
+}
+
+.card{
+  animation:cardIn .32s ease both;
+}
+
+.dashboard .dashBtn{
+  animation:buttonIn .28s ease both;
+}
+
+.dashboard .dashBtn:nth-child(2){animation-delay:.03s}
+.dashboard .dashBtn:nth-child(3){animation-delay:.06s}
+.dashboard .dashBtn:nth-child(4){animation-delay:.09s}
+.dashboard .dashBtn:nth-child(5){animation-delay:.12s}
+.dashboard .dashBtn:nth-child(6){animation-delay:.15s}
+.dashboard .dashBtn:nth-child(7){animation-delay:.18s}
+.dashboard .dashBtn:nth-child(8){animation-delay:.21s}
+
+.dashBtn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(0,0,0,.10);
+  border-color:#c9def1;
+}
+
+.menu{
+  animation:menuIn .18s ease both;
+  transform-origin:top right;
+}
+
+.menu.hidden{animation:none}
+
+.section.open{
+  animation:sectionIn .24s ease both;
+  min-height:calc(100vh - 120px);
+}
+
+.sectionBack{
+  margin-bottom:14px;
+}
+
+.sectionPageNote{
+  color:#68768a;
+  font-size:13px;
+  margin:-5px 0 14px;
+}
+
+/* Each health option behaves like its own page.
+   The dashboard/navigation is hidden while a section is open. */
+#patientPage.sectionPageMode #patientNav{
+  display:none!important;
+}
+
+.toast{
+  animation:toastIn .22s ease both;
+}
+
+.header{
+  box-shadow:0 3px 18px rgba(0,70,130,.14);
+}
+
+.menuBtn:hover{background:#ffffff35}
+
+.authbox{
+  animation:authIn .38s ease both;
+}
+
+.primary:hover{
+  box-shadow:0 5px 15px rgba(8,119,223,.25);
+  transform:translateY(-1px);
+}
+
+.success:hover{
+  box-shadow:0 5px 15px rgba(16,166,106,.22);
+  transform:translateY(-1px);
+}
+
+.secondary:hover{background:#dfe8f2}
+
+.danger:hover{
+  box-shadow:0 5px 15px rgba(228,67,67,.18);
+  transform:translateY(-1px);
+}
+
+.record{animation:recordIn .2s ease both}
+.med{animation:recordIn .2s ease both}
+
+.day{
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+
+.day:hover{
+  transform:translateY(-2px);
+  box-shadow:0 3px 9px rgba(0,0,0,.08);
+}
+
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes buttonIn{
+  from{opacity:0;transform:translateY(8px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes sectionIn{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes menuIn{
+  from{opacity:0;transform:scale(.96) translateY(-4px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+@keyframes authIn{
+  from{opacity:0;transform:translateY(12px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes toastIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes recordIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Profile edit */
+.profileCard{max-width:1050px;margin-left:auto;margin-right:auto}
+.profileEditBtn{margin-top:14px;min-width:150px}
+.profileEditActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.profileEditActions button{min-width:130px}
+
+.profileAvatarWrap{display:flex;align-items:center;gap:18px;margin:10px 0 22px;flex-wrap:wrap}
+.profileAvatar{width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid #e5e7eb;box-shadow:0 6px 18px rgba(0,0,0,.08);background:#f3f4f6}
+.profileAvatarPlaceholder{display:flex;align-items:center;justify-content:center;font-size:44px;color:#9ca3af}
+.profilePhotoActions{display:flex;gap:10px;flex-wrap:wrap}
+.profilePhotoHint{font-size:13px;color:#6b7280;margin-top:6px}
+
+/* Mobile */
+
+@media(max-width:700px){
+
+  .grid,.medgrid{
+    grid-template-columns:1fr;
+  }
+
+  .dashboard{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .profile{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .container{
+    width:96%;
+    margin:12px auto;
+  }
+
+  .card{
+    padding:14px;
+    margin:11px 0;
+    border-radius:13px;
+  }
+
+  .header{
+    padding:15px 13px;
+  }
+
+  .header h1{
+    font-size:19px;
+  }
+
+  .menu{
+    right:8px;
+    top:55px;
+    width:210px;
+  }
+
+  .dashboard{
+    gap:9px;
+  }
+
+  .dashBtn{
+    min-height:88px;
+    padding:10px;
+  }
+
+  .day{
+    min-height:38px;
+    padding:5px;
+    font-size:11px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition:none!important;
+  }
+}
+
+/* Page transition */
+
+#pageTransition{
+  position:fixed;
+  inset:0;
+  background:#eef5fb;
+  z-index:9998;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .22s ease;
+}
+
+#pageTransition.show{opacity:1}
+
+.pageSwap{
+  animation:pageSwap .28s ease both;
+}
+
+@keyframes pageSwap{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+.roleBadge{display:inline-block;margin-left:8px;padding:4px 9px;border-radius:999px;font-weight:700;font-size:12px;background:rgba(255,193,7,.16);border:1px solid rgba(255,193,7,.35);color:#9a6700}.roleBadge.super{background:rgba(255,193,7,.18)}.roleBadge.admin{background:rgba(33,150,243,.14);border-color:rgba(33,150,243,.3);color:#1565c0}
+</style>
+</head>
+
+<body>
+
+<div id="pageTransition"></div>
+
+<div id="pageLoader"
+style="position:fixed;inset:0;background:#eef5fb;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .25s ease">
+
+  <div style="background:#fff;padding:22px 26px;border-radius:16px;box-shadow:0 8px 30px #0002;text-align:center;color:#0871d8;font-weight:700">
+    <div style="font-size:30px;margin-bottom:6px">🏥</div>
+    Loading Lifetime Health Record...
+  </div>
+
+</div>
+
+<!-- AUTH -->
+
+<div id="auth" class="auth">
+
+<div class="authbox">
+
+<h1>🏥 Lifetime Health Record</h1>
+
+<div class="tabs">
+
+<button id="loginTab"
+class="active"
+onclick="showLogin()">
+🔐 Login
+</button>
+
+<button id="registerTab"
+onclick="showRegister()">
+📝 Registration
+</button>
+
+</div>
+
+<!-- LOGIN -->
+
+<div id="loginForm">
+
+<label>Username / Patient ID / Phone / Gmail</label>
+
+<input
+id="loginKey"
+placeholder="Username, Patient ID, phone or Gmail">
+
+<br><br>
+
+<label>Password</label>
+
+<input
+id="loginPass"
+type="password"
+placeholder="Enter password">
+
+<br><br>
+
+<button
+class="primary"
+style="width:100%"
+onclick="login()">
+Login
+</button>
+
+<div style="text-align:center;margin-top:10px">
+  <button type="button" onclick="forgotPassword()" style="background:none;border:none;color:#2563eb;text-decoration:underline;cursor:pointer;font-weight:600">
+    Forgot password?
+  </button>
+  <div class="sub" style="margin-top:5px">Recover with phone OTP, email OTP, or your recovery code.</div>
+</div>
+
+<p class="sub">
+Username, Patient ID, registered phone number অথবা Gmail + password দিয়ে login করা যাবে।
+</p>
+
+</div>
+
+<!-- REGISTER -->
+
+<div id="registerForm" class="hidden">
+
+<label>Patient Name</label>
+
+<input
+id="regName"
+placeholder="Full name">
+
+<br><br>
+
+<label>Username <span style="color:#d33">*</span></label>
+
+<input
+id="regUsername"
+placeholder="Choose a unique username"
+autocomplete="off">
+
+<p class="sub" style="margin-top:6px">এই username দিয়েই অন্য রোগীরা আপনাকে search করে friend request পাঠাতে পারবে। 3–20 characters, শুধু A-Z, 0-9 ও _ ব্যবহার করুন।</p>
+
+<br>
+
+<label>
+Phone Number
+<span style="color:#d33">*</span>
+</label>
+
+<input
+id="regPhone"
+type="tel"
+inputmode="numeric"
+placeholder="01XXXXXXXXX"
+required>
+
+<br><br>
+
+<label>
+Gmail / Email
+<span class="sub">(optional)</span>
+</label>
+
+<input
+id="regEmail"
+type="email"
+placeholder="example@gmail.com">
+
+<br><br>
+
+<label>Password</label>
+
+<input
+id="regPass"
+type="password"
+placeholder="Create password">
+
+<br><br>
+
+<label>Confirm Password</label>
+
+<input
+id="regConfirm"
+type="password"
+placeholder="Confirm password">
+
+<br><br>
+
+<label>Gender</label>
+
+<div class="gender">
+
+<label id="maleLabel">
+<input
+id="maleRadio"
+type="radio"
+name="regGender"
+value="Male"
+onchange="pickGender()">
+👦 Male
+</label>
+
+<label id="femaleLabel">
+<input
+id="femaleRadio"
+type="radio"
+name="regGender"
+value="Female"
+onchange="pickGender()">
+👧 Female
+</label>
+
+</div>
+
+<br>
+
+<div class="notice">
+
+Registration-এর সময় system নিজে একটি unique Patient ID তৈরি করবে।
+আপনার পছন্দের একটি unique username অবশ্যই দিতে হবে।
+Phone number অবশ্যই দিতে হবে।
+
+<br><br>
+
+SMS service চালু থাকলে এই number-এ Patient ID পাঠানো হবে।
+
+</div>
+
+<button
+id="registerBtn"
+class="primary"
+style="width:100%"
+onclick="register()">
+
+Create New Patient ID
+
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- APP -->
+
+<div id="app" class="hidden">
+
+<header class="header">
+
+<button
+class="menuBtn"
+onclick="toggleMenu()">
+⋮
+</button>
+
+<button class="notificationBtn" type="button" onclick="toggleNotifications()" aria-label="Notifications">
+🔔
+<span id="notificationBadge" class="notificationBadge hidden">0</span>
+</button>
+
+<div id="notificationPanel" class="card notificationPanel hidden">
+  <div class="top">
+    <div><h3 style="margin:0">🔔 Notifications</h3><div class="sub">Friend request ও Doctor information এখানে দেখা যাবে।</div></div>
+    <button class="secondary" type="button" onclick="markAllNotificationsRead()">✓ Read all</button>
+  </div>
+  <div id="notificationList"></div>
+</div>
+
+<h1>🏥 Lifetime Health Record</h1>
+
+<small>
+Doctor Portal & Patient Health Management System
+</small>
+
+<div id="menu" class="menu hidden">
+
+<button onclick="showHome();closeMenu()">
+🏠 Home
+</button>
+
+<button onclick="showPatient();closeMenu()">
+👤 Patient
+</button>
+
+<button onclick="showProfile();closeMenu()">
+👤 Profile
+</button>
+
+<button onclick="showFriends();closeMenu()">
+👥 Friends / Find by ID
+</button>
+
+<button onclick="showDoctor();closeMenu()">
+🧑‍⚕️ Doctor Portal
+</button>
+
+<button id="adminMenuBtn" class="hidden" onclick="showAdmin();closeMenu()">
+👑 Admin Panel
+</button>
+
+<button onclick="logout();closeMenu()">
+🚪 Logout
+</button>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+<!-- HOME -->
+
+<div id="home">
+
+<div id="adminQuickCard" class="card hidden" style="margin-bottom:15px">
+  <div class="top">
+    <div><h3 style="margin:0">👑 Admin Panel</h3><div class="sub">Manage admins and send app-wide notices.</div></div>
+    <button class="primary" type="button" onclick="showAdmin()">Open Admin Panel</button>
+  </div>
+</div>
+
+<div class="card">
+
+<div class="top">
+
+<div>
+
+<h2 id="welcome"></h2>
+
+<div class="sub">
+Patient Dashboard <span id="roleBadge" class="roleBadge hidden"></span>
+</div>
+
+</div>
+
+<button
+class="secondary"
+onclick="showProfile()">
+👤 Profile
+</button>
+
+</div>
+
+<div class="notice">
+
+⋮ Menu থেকে <b>Patient</b> চাপলে প্রতিটি health information-এর জন্য আলাদা page button পাওয়া যাবে।
+
+</div>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+<b id="statMed">0</b>
+<span>Medicines</span>
+</div>
+
+<div class="stat">
+<b id="statTaken">0</b>
+<span>Taken</span>
+</div>
+
+<div class="stat">
+<b id="statEvents">0</b>
+<span>Calendar Events</span>
+</div>
+
+<div class="stat">
+<b id="statRecords">0</b>
+<span>Health Records</span>
+</div>
+
+</div>
+
+
+<div class="card homeInfoHeader">
+
+<h2>📚 Health Information Center</h2>
+
+<p class="sub">এখানে গুরুত্বপূর্ণ স্বাস্থ্য তথ্য, ডাক্তার দেখানোর সাধারণ গাইড, পরামর্শ ও প্রয়োজনীয় রিমাইন্ডার থাকবে। Health Record দেখতে <b>⋮ Menu → Patient</b> এ যান।</p>
+
+</div>
+
+<div id="homeInfoGrid" class="grid homeInfoGrid">
+
+<div class="card infoCard">
+<h3>👨‍⚕️ Doctor Visit Guide</h3>
+<p><b>General Physician:</b> সাধারণ অসুস্থতা, জ্বর, কাশি বা নিয়মিত check-up-এর জন্য।</p>
+<p><b>Dentist:</b> দাঁত ও মুখের নিয়মিত পরীক্ষা ও সমস্যা নিয়ে পরামর্শের জন্য।</p>
+<p><b>Eye Specialist:</b> চোখের সমস্যা বা দৃষ্টির পরীক্ষা প্রয়োজন হলে।</p>
+<p><b>Medicine/Diabetes Specialist:</b> দীর্ঘমেয়াদি রোগ বা glucose-related follow-up-এর ক্ষেত্রে।</p>
+</div>
+
+<div class="card infoCard">
+<h3>💡 Important Health Advice</h3>
+<ul>
+<li>ডাক্তারের পরামর্শ ছাড়া ওষুধ শুরু বা বন্ধ করবেন না।</li>
+<li>নিয়মিত স্বাস্থ্য তথ্য ও রিপোর্ট আপডেট রাখুন।</li>
+<li>পর্যাপ্ত পানি পান, সুষম খাবার ও নিয়মিত ঘুমের অভ্যাস রাখুন।</li>
+<li>শরীর খারাপ হলে প্রয়োজন অনুযায়ী অভিভাবক/বিশ্বস্ত বড় ব্যক্তি ও চিকিৎসকের সাহায্য নিন।</li>
+</ul>
+</div>
+
+<div class="card infoCard">
+<h3>🚨 Important Information</h3>
+<ul>
+<li>জরুরি বা দ্রুত খারাপ হতে থাকা উপসর্গ হলে দেরি না করে চিকিৎসা নিন।</li>
+<li>অ্যালার্জি, blood group ও emergency contact-এর তথ্য আপডেট রাখুন।</li>
+<li>পুরোনো prescription ও medical report নিরাপদে সংরক্ষণ করুন।</li>
+</ul>
+</div>
+
+<div class="card infoCard">
+<h3>💊 Medicine Safety</h3>
+<ul>
+<li>ওষুধের নাম, dose ও সময় ঠিকভাবে লিখে রাখুন।</li>
+<li>অন্যের prescription-এর ওষুধ নিজের জন্য ব্যবহার করবেন না।</li>
+<li>ওষুধের label ও expiry date দেখে ব্যবহার করুন।</li>
+</ul>
+</div>
+
+<div class="card infoCard">
+<h3>🩺 Regular Check-up</h3>
+<p>প্রয়োজন অনুযায়ী blood pressure, glucose, চোখ, দাঁত ও অন্যান্য স্বাস্থ্য পরীক্ষা সম্পর্কে চিকিৎসকের সঙ্গে আলোচনা করুন। আপনার Health Record-এ পাওয়া রিপোর্টগুলো নিয়মিত আপডেট করলে আগের তথ্যও সহজে দেখা যাবে।</p>
+</div>
+
+<div class="card infoCard">
+<h3>🥗 Healthy Lifestyle</h3>
+<ul>
+<li>সুষম খাবার ও পর্যাপ্ত পানি পান করুন।</li>
+<li>নিয়মিত নিরাপদ শারীরিক কার্যক্রম করুন।</li>
+<li>পর্যাপ্ত ঘুম ও বিশ্রাম নিন।</li>
+<li>ধূমপান ও ক্ষতিকর পদার্থ থেকে দূরে থাকুন।</li>
+</ul>
+</div>
+
+<div class="card infoCard">
+<h3>🩸 Blood Donation Information</h3>
+<p>রক্তদানের আগে বয়স, স্বাস্থ্য ও অন্যান্য eligibility-এর বিষয়গুলো নিশ্চিত করতে চিকিৎসক বা অনুমোদিত blood donation centre-এর নির্দেশনা অনুসরণ করুন। নিজের blood group ও donation history record করে রাখতে পারেন।</p>
+</div>
+
+<div class="card infoCard" id="homeAppointments">
+<h3>📅 Upcoming Doctor Visit / Appointment</h3>
+<p id="homeAppointmentText">আপনার Calendar-এ কোনো upcoming appointment থাকলে এখানে দেখা যাবে।</p>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- PATIENT PAGE -->
+
+<div id="patientPage" class="hidden">
+
+<div id="patientNav" class="card">
+
+<div class="top">
+
+<h2>👤 Patient Health Center</h2>
+
+<button
+class="secondary"
+onclick="showHome()">
+← Home
+</button>
+
+</div>
+
+<p class="sub">
+প্রতিটি button একটি আলাদা page খুলবে। Page খুললে অন্য health buttons দেখা যাবে না।
+</p>
+
+<div id="dashboard2" class="dashboard"></div>
+
+</div>
+
+
+<!-- PATIENT INFORMATION -->
+
+<div id="secPatient" class="section card">
+
+<h2>👤 Patient Information</h2>
+
+<div class="grid">
+
+<div>
+<label>Patient ID</label>
+<input id="pId" readonly>
+</div>
+
+<div>
+<label>Name</label>
+<input id="pName">
+</div>
+
+<div>
+<label>Age</label>
+<input id="pAge" type="number">
+</div>
+
+<div>
+<label>Gender</label>
+<input id="pGender" readonly>
+</div>
+
+<div>
+<label>Date of Birth</label>
+<input id="pDob" type="date">
+</div>
+
+<div>
+<label>Blood Group</label>
+
+<select id="pBlood">
+
+<option value="">Select</option>
+<option>A+</option>
+<option>A-</option>
+<option>B+</option>
+<option>B-</option>
+<option>AB+</option>
+<option>AB-</option>
+<option>O+</option>
+<option>O-</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Phone</label>
+<input id="pPhone">
+</div>
+
+<div>
+<label>Email</label>
+<input id="pEmail">
+</div>
+
+<div class="full">
+<label>Address</label>
+<textarea id="pAddress"></textarea>
+</div>
+
+<div class="full">
+<label>Emergency Contact</label>
+<input id="pEmergency">
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="savePatient()">
+💾 Save
+</button>
+
+</div>
+
+
+<!-- MEDICINE -->
+
+<div id="secMedicine" class="section card">
+
+<h2>💊 Medicine / Medication</h2>
+
+<p class="sub">
+প্রতিটি medicine আলাদা করে add করুন। ওষুধ খাওয়ার পরে ☑️ Taken mark করুন।
+</p>
+
+<div id="medList"></div>
+
+<button
+class="primary"
+onclick="addMedicine()">
+➕ Add Medicine
+</button>
+
+</div>
+
+
+<!-- BP -->
+
+<div id="secBP" class="section card">
+
+<h2>❤️ Blood Pressure</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="bpDate" type="date">
+</div>
+
+<div>
+<label>Time</label>
+<input id="bpTime" type="time">
+</div>
+
+<div>
+<label>Systolic</label>
+<input id="bpSys" type="number">
+</div>
+
+<div>
+<label>Diastolic</label>
+<input id="bpDia" type="number">
+</div>
+
+<div class="full">
+<label>Notes</label>
+<textarea id="bpNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveBP()">
+Save Record
+</button>
+
+<div id="bpRecords"></div>
+
+</div>
+
+
+<!-- GLUCOSE -->
+
+<div id="secGlucose" class="section card">
+
+<h2>🩺 Diabetes / Blood Glucose</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="gDate" type="date">
+</div>
+
+<div>
+<label>Time</label>
+<input id="gTime" type="time">
+</div>
+
+<div>
+<label>Glucose Value</label>
+<input id="gValue" type="number" step="0.1">
+</div>
+
+<div>
+<label>Measurement</label>
+
+<select id="gType">
+
+<option>Fasting</option>
+<option>Before Meal</option>
+<option>After Meal</option>
+<option>Random</option>
+
+</select>
+
+</div>
+
+<div class="full">
+<label>Notes</label>
+<textarea id="gNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveGlucose()">
+Save Record
+</button>
+
+<div id="gRecords"></div>
+
+</div>
+
+
+<!-- EYE -->
+
+<div id="secEye" class="section card">
+
+<h2>👁️ Eye Examination</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="eDate" type="date">
+</div>
+
+<div>
+<label>Right Eye</label>
+<input id="eRight">
+</div>
+
+<div>
+<label>Left Eye</label>
+<input id="eLeft">
+</div>
+
+<div>
+<label>Eye Pressure</label>
+<input id="ePressure">
+</div>
+
+<div class="full">
+<label>Doctor Notes</label>
+<textarea id="eNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveEye()">
+Save Record
+</button>
+
+<div id="eRecords"></div>
+
+</div>
+
+
+<!-- DENTAL -->
+
+<div id="secDental" class="section card">
+
+<h2>🦷 Dental Examination</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="dDate" type="date">
+</div>
+
+<div>
+<label>Condition</label>
+<input id="dCondition">
+</div>
+
+<div>
+<label>Treatment</label>
+<input id="dTreatment">
+</div>
+
+<div>
+<label>Next Visit</label>
+<input id="dNext" type="date">
+</div>
+
+<div class="full">
+<label>Notes</label>
+<textarea id="dNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveDental()">
+Save Record
+</button>
+
+<div id="dRecords"></div>
+
+</div>
+
+
+<!-- DONATION -->
+
+<div id="secDonation" class="section card">
+
+<h2>🩸 Blood Donation</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="donDate" type="date">
+</div>
+
+<div>
+<label>Blood Group</label>
+<input id="donBlood">
+</div>
+
+<div>
+<label>Donation Center</label>
+<input id="donCenter">
+</div>
+
+<div>
+<label>Units</label>
+<input id="donUnits" type="number">
+</div>
+
+<div class="full">
+<label>Notes</label>
+<textarea id="donNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveDonation()">
+Save Record
+</button>
+
+<div id="donRecords"></div>
+
+</div>
+
+
+<!-- PRESCRIPTION & MEDICAL PHOTOS -->
+<div id="secPrescriptions" class="section card">
+<h2>📸 Prescription & Medical Photos</h2>
+<p class="sub">ডাক্তারের prescription, test report, medical paper বা প্রয়োজনীয় health document-এর ছবি তুলে এখানে সংরক্ষণ করুন। পরে doctor-এর কাছে গেলে একই জায়গা থেকে দেখাতে পারবেন।</p>
+<div class="notice">🔒 এই version-এ ছবিগুলো আপনার browser-এর local storage-এ সংরক্ষিত হবে। Browser data মুছে ফেললে ছবিগুলোও হারিয়ে যেতে পারে।</div>
+<div class="grid">
+<div><label>Document title</label><input id="rxTitle" placeholder="যেমন: Doctor Prescription - 10 Sep 2026"></div>
+<div><label>Date</label><input id="rxDate" type="date"></div>
+<div class="full"><label>Prescription photo</label>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input id="rxCamera" type="file" accept="image/*" capture="environment" multiple onchange="mergePrescriptionFiles(this.files)" style="display:none">
+<input id="rxGallery" type="file" accept="image/*" multiple onchange="mergePrescriptionFiles(this.files)" style="display:none">
+<button class="primary" type="button" onclick="$('rxCamera').click()">📷 Take Photo</button>
+<button class="secondary" type="button" onclick="$('rxGallery').click()">🖼️ Gallery</button>
+</div>
+<input id="rxPhotos" type="file" accept="image/*" multiple style="display:none">
+<p id="rxPhotoCount" class="sub" style="margin-top:6px">কোনো ছবি নির্বাচন করা হয়নি।</p></div>
+</div>
+<div id="rxPreview" class="rxPreview"></div>
+<button class="success" type="button" onclick="savePrescriptionPhotos()">💾 Save Photos</button>
+<hr style="margin:20px 0;opacity:.2">
+<h3>📚 Saved Prescriptions & Reports</h3>
+<div id="prescriptionList"></div>
+</div>
+
+<!-- CALENDAR -->
+
+<div id="secCalendar" class="section card">
+
+<h2>📅 Health / Appointment Calendar</h2>
+
+<div class="grid">
+
+<div>
+<label>Date</label>
+<input id="evDate" type="date">
+</div>
+
+<div>
+<label>Time</label>
+<input id="evTime" type="time">
+</div>
+
+<div>
+<label>Event Type</label>
+
+<select id="evType">
+
+<option>Doctor Appointment</option>
+<option>Medicine</option>
+<option>Test</option>
+<option>Checkup</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Title</label>
+<input id="evTitle">
+</div>
+
+<div class="full">
+<label>Notes</label>
+<textarea id="evNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="saveEvent()">
+➕ Add Event
+</button>
+
+<div id="evRecords"></div>
+
+<div class="calhead">
+
+<button
+class="secondary"
+onclick="moveGeneral(-1)">
+◀
+</button>
+
+<span id="generalTitle" class="calTitle"></span>
+
+<button
+class="secondary"
+onclick="moveGeneral(1)">
+▶
+</button>
+
+</div>
+
+<div class="week">
+<div>Sun</div>
+<div>Mon</div>
+<div>Tue</div>
+<div>Wed</div>
+<div>Thu</div>
+<div>Fri</div>
+<div>Sat</div>
+</div>
+
+<div id="generalDays" class="days"></div>
+
+</div>
+
+
+<!-- FEMALE -->
+
+<div id="femaleSections" class="hidden">
+
+<!-- PERIOD -->
+
+<div id="secPeriod" class="section card">
+
+<h2>🩸 Last Period Tracker</h2>
+
+<div class="grid">
+
+<div>
+<label>Last Period Date</label>
+<input
+id="lmp"
+type="date"
+onchange="calcPeriod()">
+</div>
+
+<div>
+<label>Cycle Length (days)</label>
+<input
+id="cycle"
+type="number"
+value="28"
+onchange="calcPeriod()">
+</div>
+
+<div>
+<label>Expected Next Period</label>
+<input id="nextPeriod" readonly>
+</div>
+
+<div>
+<label>Period Duration</label>
+<input
+id="periodDuration"
+type="number"
+value="5">
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="savePeriod()">
+💾 Save Period
+</button>
+
+<div class="calhead">
+
+<button
+class="secondary"
+onclick="movePeriod(-1)">
+◀
+</button>
+
+<span id="periodTitle" class="calTitle"></span>
+
+<button
+class="secondary"
+onclick="movePeriod(1)">
+▶
+</button>
+
+</div>
+
+<div class="week">
+<div>Sun</div>
+<div>Mon</div>
+<div>Tue</div>
+<div>Wed</div>
+<div>Thu</div>
+<div>Fri</div>
+<div>Sat</div>
+</div>
+
+<div id="periodDays" class="days"></div>
+
+</div>
+
+
+<!-- PREGNANCY -->
+
+<div id="secPreg" class="section card">
+
+<h2>🤰 Pregnancy Report</h2>
+
+<div class="grid">
+
+<div>
+<label>Status</label>
+
+<select id="pregStatus">
+
+<option value="No">
+Not Pregnant
+</option>
+
+<option value="Yes">
+Pregnant
+</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Test Date</label>
+<input id="pregTest" type="date">
+</div>
+
+<div>
+<label>Pregnancy Week</label>
+<input id="pregWeek" type="number">
+</div>
+
+<div>
+<label>Estimated Due Date</label>
+<input id="due" type="date">
+</div>
+
+<div>
+<label>Last Period Date</label>
+<input
+id="pregLmp"
+type="date"
+onchange="calcDue()">
+</div>
+
+<div class="full">
+<label>Doctor Report / Notes</label>
+<textarea id="pregNote"></textarea>
+</div>
+
+</div>
+
+<button
+class="success"
+onclick="savePregnancy()">
+💾 Save Pregnancy
+</button>
+
+<div class="calhead">
+
+<button
+class="secondary"
+onclick="movePreg(-1)">
+◀
+</button>
+
+<span id="pregTitle" class="calTitle"></span>
+
+<button
+class="secondary"
+onclick="movePreg(1)">
+▶
+</button>
+
+</div>
+
+<div class="week">
+<div>Sun</div>
+<div>Mon</div>
+<div>Tue</div>
+<div>Wed</div>
+<div>Thu</div>
+<div>Fri</div>
+<div>Sat</div>
+</div>
+
+<div id="pregDays" class="days"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- FRIENDS / PATIENT ID SEARCH -->
+
+<div id="friendsPage" class="hidden">
+
+<div class="card">
+
+<div class="top">
+<div>
+<h2>👥 Friends</h2>
+<div class="sub">Username দিয়ে অন্য user খুঁজে friend request পাঠান।</div>
+</div>
+
+<button class="secondary" onclick="showHome()">
+← Home
+</button>
+</div>
+
+<div class="notice">
+🔎 আপনার পছন্দের <b>Username</b> দিয়ে user search করা যাবে। Friend request পাঠানোর পর অন্য user সেটি accept করলে দুজনের Friends list-এ যুক্ত হবে।
+</div>
+
+<div class="grid">
+<div>
+<label>Search Username</label>
+<input id="friendSearchUsername" placeholder="যেমন: durjoy_08" autocomplete="off">
+</div>
+</div>
+
+<div style="margin-top:14px">
+<button class="primary" type="button" onclick="searchFriendByUsername()">
+🔎 Search Username
+</button>
+</div>
+
+<div id="friendSearchResult" style="margin-top:18px"></div>
+
+</div>
+
+<div class="card">
+<h2>🤝 Friend Requests</h2>
+<div id="friendRequestsList"></div>
+</div>
+
+<div class="card">
+<h2>📤 Requested for Friend</h2>
+<div class="sub" style="margin-bottom:12px">আপনি যাদের কাছে friend request পাঠিয়েছেন, তাদের তালিকা এখানে দেখা যাবে।</div>
+<div id="sentFriendRequestsList"></div>
+</div>
+
+<div class="card">
+<h2>👥 My Friends</h2>
+<div class="sub" style="margin-bottom:12px">My Friends-এ click করলে আপনার সব friends-এর তালিকা দেখা যাবে।</div>
+
+<button class="primary" type="button" onclick="toggleMyFriends()">
+👥 My Friends
+</button>
+
+<div id="friendsListWrap" class="hidden" style="margin-top:16px">
+  <div id="friendsList"></div>
+</div>
+</div>
+
+</div>
+
+
+<!-- ADMIN PANEL -->
+<div id="adminPage" class="hidden">
+  <div class="card">
+    <div class="top">
+      <div><h2>👑 Admin Panel</h2><div class="sub">Manage admins and send app-wide notices.</div></div>
+      <button class="secondary" type="button" onclick="showHome()">🏠 Home</button>
+    </div>
+    <div class="notice">Only the first account created globally can have Super Admin privileges. All later accounts are User unless the Super Admin promotes them to Admin.</div>
+  </div>
+
+  <div class="card">
+    <h3>📢 Send Notice to Everyone</h3>
+    <label>Notice title</label>
+    <input id="adminNoticeTitle" placeholder="e.g. Clinic holiday notice">
+    <br><br>
+    <label>Notice / Update</label>
+    <textarea id="adminNoticeMessage" rows="5" placeholder="Write the update for all patients..."></textarea>
+    <br><br>
+    <button class="primary" type="button" onclick="sendAdminNotice()">📢 Send Notice</button>
+  </div>
+
+  <div class="card">
+    <h3>➕ Add Admin</h3>
+    <label>Account ID</label>
+    <input id="adminPromoteAccountId" placeholder="e.g. LHR-12345-67890" autocomplete="off">
+    <br><br>
+    <button class="primary" type="button" onclick="promoteAdmin()">➕ Make Admin</button>
+    <div id="adminUsersList" style="margin-top:15px"></div>
+  </div>
+
+  <div class="card">
+    <h3>📜 Recent Notices</h3>
+    <div id="adminNoticeHistory"></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+
+<div id="profilePage" class="hidden">
+
+<div class="card profileCard">
+
+<div id="profileView">
+
+<h2>👤 Patient Profile</h2>
+
+<div class="profileAvatarWrap">
+  <div id="profileAvatar"></div>
+  <div>
+    <b>Profile Photo</b>
+    <div class="profilePhotoHint">Your own photo can be added to your profile.</div>
+  </div>
+</div>
+
+<div id="profileBox" class="profile"></div>
+
+<button class="primary profileEditBtn" onclick="editProfile()">
+✏️ Edit Profile
+</button>
+
+<button class="danger profileEditBtn" type="button" onclick="deleteMyAccount()">
+🗑️ Delete My Account
+</button>
+
+</div>
+
+<div id="profileEdit" class="hidden">
+
+<h2>✏️ Edit Profile</h2>
+
+<div class="profileAvatarWrap">
+  <div id="editProfileAvatar"></div>
+  <div>
+    <label>Profile Photo</label>
+    <input id="editPhoto" type="file" accept="image/*" onchange="previewProfilePhoto(event)">
+    <div class="profilePhotoActions">
+      <button type="button" class="secondary" onclick="removeProfilePhoto()">🗑️ Remove Photo</button>
+    </div>
+    <div class="profilePhotoHint">JPG, PNG or other image. The photo is stored in this account on this browser.</div>
+  </div>
+</div>
+
+<div class="grid">
+
+<div>
+<label>Patient ID</label>
+<input id="editId" readonly>
+</div>
+
+<div>
+<label>Username</label>
+<input id="editUsername" placeholder="Choose a unique username" autocomplete="off">
+</div>
+
+<div>
+<label>Name</label>
+<input id="editName">
+</div>
+
+<div>
+<label>Age</label>
+<input id="editAge" type="number" min="0">
+</div>
+
+<div>
+<label>Gender</label>
+<select id="editGender">
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+</select>
+</div>
+
+<div>
+<label>Date of Birth</label>
+<input id="editDob" type="date">
+</div>
+
+<div>
+<label>Blood Group</label>
+<select id="editBlood">
+<option value="">Select</option>
+<option>A+</option>
+<option>A-</option>
+<option>B+</option>
+<option>B-</option>
+<option>AB+</option>
+<option>AB-</option>
+<option>O+</option>
+<option>O-</option>
+</select>
+</div>
+
+<div>
+<label>Phone</label>
+<input id="editPhone" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX">
+</div>
+
+<div>
+<label>Gmail / Email</label>
+<input id="editEmail" type="email" placeholder="example@gmail.com">
+</div>
+
+<div class="full">
+<label>Address</label>
+<textarea id="editAddress"></textarea>
+</div>
+
+<div class="full">
+<label>Emergency Contact</label>
+<input id="editEmergency">
+</div>
+
+</div>
+
+<div class="profileEditActions">
+<button class="success" onclick="saveProfileEdit()">💾 Save Profile</button>
+<button class="secondary" onclick="cancelProfileEdit()">Cancel</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- DOCTOR -->
+
+<div id="doctorPage" class="hidden">
+
+<div class="card">
+
+<div class="top">
+
+<h2>🧑‍⚕️ Doctor Portal</h2>
+
+<button
+class="secondary"
+onclick="showHome()">
+← Home
+</button>
+
+</div>
+
+<div class="notice">
+Doctor patient-এর username দিয়ে search করে গুরুত্বপূর্ণ information পাঠাতে পারবেন। Backend চালু থাকলে message server-এর মাধ্যমে সব registered user-এর notification-এ যাবে। Backend না থাকলে এটি শুধু এই browser-এ demo হিসেবে কাজ করবে।
+</div>
+
+<div class="grid" style="margin-top:16px">
+<div>
+<label>Patient Username</label>
+<input id="doctorNotifyUsername" placeholder="যেমন: durjoy_08">
+</div>
+<div>
+<label>Information Title</label>
+<input id="doctorNotifyTitle" placeholder="যেমন: Follow-up Information">
+</div>
+</div>
+
+<label style="margin-top:12px;display:block">Doctor Information</label>
+<textarea id="doctorNotifyMessage" rows="4" placeholder="Patient-এর জন্য গুরুত্বপূর্ণ তথ্য লিখুন..."></textarea>
+
+<div style="margin-top:14px">
+<button class="primary" type="button" onclick="sendDoctorNotification()">📤 Send Information</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+var accounts={};
+var currentId="";
+var current=null;
+var gender="";
+var generalDate=new Date();
+var periodDate=new Date();
+var pregDate=new Date();
+
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+function showToast(message){
+
+  var toast=$("toast");
+
+  toast.textContent=String(message);
+  toast.style.display="block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(function(){
+    toast.style.display="none";
+  },2500);
+}
+
+
+function today(){
+  return formatDate(new Date());
+}
+
+
+function formatDate(date){
+
+  return date.getFullYear()+"-"+
+  String(date.getMonth()+1).padStart(2,"0")+"-"+
+  String(date.getDate()).padStart(2,"0");
+
+}
+
+
+function addDays(dateString,days){
+
+  var d=new Date(dateString+"T00:00:00");
+
+  d.setDate(d.getDate()+Number(days));
+
+  return formatDate(d);
+
+}
+
+
+function initializeFreshAccountStorage(){
+  if(localStorage.getItem("lhrFreshV13Initialized")!=="yes"){
+    var keys=[];
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k && /^lhr/i.test(k)) keys.push(k);
+    }
+    keys.forEach(function(k){ localStorage.removeItem(k); });
+    localStorage.setItem("lhrFreshV13Initialized","yes");
+  }
+}
+
+function loadAccounts(){
+  initializeFreshAccountStorage();
+  try{
+    accounts=JSON.parse(localStorage.getItem("lhrAccountsFreshV13")||"{}");
+  }catch(e){ accounts={}; }
+}
+
+function isAdmin(){
+  return !!current && (current.role==="admin" || current.role==="superadmin");
+}
+
+function isSuperAdmin(){
+  return !!current && current.role==="superadmin";
+}
+
+
+async function syncCurrentUserToBackend(){
+  if(!current) return null;
+  try{
+    var patient=current.data&&current.data.patient?current.data.patient:{};
+    var r=await fetch("/api/sync-user",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        id:current.id,
+        username:current.username,
+        name:current.name,
+        phone:current.phone||patient.phone||"",
+        email:current.email||patient.email||"",
+        password:current.password||""
+      })
+    });
+    if(!r.ok) return null;
+    var result=await r.json();
+    if(result.role){
+      current.role=result.role;
+      accounts[current.id]=current;
+      saveAccounts();
+      updateAdminMenu();
+      updateRoleBadge();
+    }
+    return result;
+  }catch(e){ console.warn("Backend user sync unavailable",e); return null; }
+}
+
+async function pullBackendNotifications(){
+  if(!current) return;
+  try{
+    var r=await fetch("/api/notifications?userId="+encodeURIComponent(current.id));
+    if(!r.ok) return;
+    var result=await r.json();
+    if(!Array.isArray(result.notifications)) return;
+    ensureFriendData(current);
+    var localById={};
+    current.notifications.forEach(function(n){ localById[n.id]=n; });
+    result.notifications.forEach(function(n){
+      if(!localById[n.id]) current.notifications.push(n);
+    });
+    if(Array.isArray(result.friendRequests)) current.friendRequests=result.friendRequests;
+    saveAccounts();
+    renderNotifications();
+    refreshNotificationUI();
+  }catch(e){ console.warn("Backend notification sync unavailable",e); }
+}
+
+function saveAccounts(){
+
+  localStorage.setItem(
+    "lhrAccountsFreshV13",
+    JSON.stringify(accounts)
+  );
+
+}
+
+
+function makeRecoveryCode(){
+
+  var chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var code="";
+
+  if(window.crypto && window.crypto.getRandomValues){
+    var bytes=new Uint8Array(8);
+    window.crypto.getRandomValues(bytes);
+    for(var i=0;i<8;i++) code+=chars[bytes[i]%chars.length];
+  }else{
+    for(var j=0;j<8;j++) code+=chars[Math.floor(Math.random()*chars.length)];
+  }
+
+  return code.slice(0,4)+"-"+code.slice(4);
+
+}
+
+
+function makeId(){
+
+  var id="";
+  var bytes=new Uint32Array(2);
+
+  function create(){
+
+    if(
+      window.crypto &&
+      window.crypto.getRandomValues
+    ){
+      window.crypto.getRandomValues(bytes);
+    }else{
+      bytes[0]=Math.floor(Math.random()*4294967295);
+      bytes[1]=Math.floor(Math.random()*4294967295);
+    }
+
+    return "LHR-"+
+      String(bytes[0]).slice(0,5)+
+      "-"+
+      String(bytes[1]).slice(0,5);
+
+  }
+
+  id=create();
+
+  while(accounts[id]){
+    id=create();
+  }
+
+  return id;
+
+}
+
+
+function pickGender(){
+
+  gender=$("maleRadio").checked?
+    "Male":
+    "Female";
+
+  $("maleLabel").classList.remove("chosen");
+  $("femaleLabel").classList.remove("chosen");
+
+  if(gender==="Male"){
+    $("maleLabel").classList.add("chosen");
+  }else{
+    $("femaleLabel").classList.add("chosen");
+  }
+
+}
+
+
+function showLogin(){
+
+  $("loginForm").classList.remove("hidden");
+  $("registerForm").classList.add("hidden");
+
+  $("loginTab").classList.add("active");
+  $("registerTab").classList.remove("active");
+
+}
+
+
+function showRegister(){
+
+  $("loginForm").classList.add("hidden");
+  $("registerForm").classList.remove("hidden");
+
+  $("loginTab").classList.remove("active");
+  $("registerTab").classList.add("active");
+
+}
+
+
+/* =========================
+   REGISTRATION + SMS
+========================= */
+
+async function register(){
+
+  loadAccounts();
+
+  var name=$("regName").value.trim();
+  var username=$("regUsername").value.trim().toLowerCase();
+  var phone=$("regPhone").value.trim();
+  var email=$("regEmail").value.trim().toLowerCase();
+  var pass=$("regPass").value;
+  var confirmPass=$("regConfirm").value;
+
+  if(!name){
+    showToast("Name is required");
+    return;
+  }
+
+  if(!username){
+    showToast("Username is required");
+    return;
+  }
+
+  if(!/^[a-z0-9_]{3,20}$/.test(username)){
+    showToast("Username: 3-20 chars, letters, numbers or _ only");
+    return;
+  }
+
+  if(!phone){
+    showToast("Phone number is required");
+    return;
+  }
+
+  if(!/^01[3-9]\d{8}$/.test(phone)){
+    showToast("Enter a valid Bangladesh mobile number");
+    return;
+  }
+
+  if(!pass){
+    showToast("Password is required");
+    return;
+  }
+
+  if(pass!==confirmPass){
+    showToast("Passwords do not match");
+    return;
+  }
+
+  if(!gender){
+    showToast("Select Male or Female");
+    return;
+  }
+
+
+  var ids=Object.keys(accounts);
+  var i;
+
+  for(i=0;i<ids.length;i++){
+
+    var oldAccount=accounts[ids[i]];
+
+    if((oldAccount.username||oldAccount.data&&oldAccount.data.patient&&oldAccount.data.patient.username||"").toLowerCase()===username){
+      showToast("This username is already taken");
+      return;
+    }
+
+    if(
+      email &&
+      oldAccount.email &&
+      oldAccount.email===email
+    ){
+      showToast("This Gmail/email is already registered");
+      return;
+    }
+
+  }
+
+
+  var id=makeId();
+
+
+  var newData={
+
+    patient:{
+      id:id,
+      username:username,
+      name:name,
+      age:"",
+      gender:gender,
+      dob:"",
+      blood:"",
+      phone:phone,
+      email:email,
+      address:"",
+      emergency:""
+    },
+
+    medicines:[],
+    bp:[],
+    glucose:[],
+    eye:[],
+    dental:[],
+    donation:[],
+    events:[],
+    prescriptions:[],
+
+    period:{
+      lmp:"",
+      cycle:28,
+      next:"",
+      duration:5
+    },
+
+    pregnancy:{
+      status:"No",
+      test:"",
+      week:"",
+      due:"",
+      lmp:"",
+      note:""
+    }
+
+  };
+
+
+  // The backend is authoritative. The first global account receives Super Admin; every later account is User.
+  accounts[id]={
+
+    id:id,
+    username:username,
+    name:name,
+    phone:phone,
+    email:email,
+    password:pass,
+    recoveryCode:makeRecoveryCode(),
+    gender:gender,
+    role:"user",
+    data:newData
+
+  };
+
+
+  saveAccounts();
+
+  currentId=id;
+  current=accounts[id];
+  current.username=username;
+  try{
+    var firstSync=await syncCurrentUserToBackend();
+    if(firstSync && firstSync.role){
+      current.role=firstSync.role;
+      accounts[id]=current;
+      saveAccounts();
+    }
+  }catch(e){
+    console.warn("Backend sync unavailable during registration",e);
+  }
+
+  localStorage.setItem(
+    "lhrCurrent",
+    id
+  );
+
+
+  /* Open app immediately */
+  openApp();
+
+  if(current && current.recoveryCode){
+    setTimeout(function(){
+      alert(
+        "ACCOUNT RECOVERY CODE\n\n" +
+        current.recoveryCode +
+        "\n\nSave this code somewhere safe. It can be used to recover the account if the password is forgotten."
+      );
+    },200);
+  }
+
+
+  /*
+    Send Patient ID to backend.
+    IMPORTANT:
+    Twilio credentials are NOT stored here.
+    They remain inside server.js/.env.
+  */
+
+  var registerBtn=$("registerBtn");
+
+  if(registerBtn){
+    registerBtn.disabled=true;
+    registerBtn.textContent="Sending Patient ID SMS...";
+  }
+
+
+  try{
+
+    var response=await fetch(
+      "/api/send-patient-id",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          name:name,
+          phone:phone,
+          email:email,
+          patientId:id
+
+        })
+
+      }
+    );
+
+
+    var result;
+
+    try{
+      result=await response.json();
+    }catch(jsonError){
+      result={
+        success:false,
+        message:"Invalid server response"
+      };
+    }
+
+
+    if(result.success){
+
+      showToast(
+        "Patient ID SMS sent ✓"
+      );
+
+    }else{
+
+      showToast(
+        "Account created. SMS failed."
+      );
+
+      console.log(
+        "SMS error:",
+        result.message
+      );
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "SMS connection error:",
+      error
+    );
+
+    showToast(
+      "Account created. SMS service unavailable."
+    );
+
+  }
+
+
+  if(registerBtn){
+
+    registerBtn.disabled=false;
+    registerBtn.textContent="Create New Patient ID";
+
+  }
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(){
+  loadAccounts();
+  var key=$("loginKey").value.trim();
+  var pass=$("loginPass").value;
+  if(!key || !pass){ showToast("Username/ID/Gmail/Phone and password required"); return; }
+
+  // Server-first login makes every account portable across devices.
+  try{
+    var r=await fetch("/api/auth-login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:key,password:pass})});
+    if(r.ok){
+      var result=await r.json();
+      if(result.success && result.user){
+        var u=result.user;
+        var local=accounts[u.id]||{};
+        found=Object.assign(local,{id:u.id,username:u.username,name:u.name||"",phone:u.phone||"",email:u.email||"",password:pass,role:u.role||"user"});
+        accounts[u.id]=found; saveAccounts();
+        currentId=u.id; current=found;
+        await syncCurrentUserToBackend();
+        await pullBackendNotifications();
+        localStorage.setItem("lhrCurrent",currentId);
+        openApp();
+        showToast("Login successful");
+        return;
+      }
+    }
+  }catch(e){ console.warn("Server login unavailable",e); }
+
+  // Same-device fallback only. It never creates or upgrades a Super Admin locally.
+  var ids=Object.keys(accounts), found=null;
+  for(var i=0;i<ids.length;i++){
+    var a=accounts[ids[i]];
+    var username=(a.username || (a.data&&a.data.patient&&a.data.patient.username) || "").toLowerCase();
+    var usernameMatch=username===key.toLowerCase();
+    var idMatch=a.id && a.id.toLowerCase()===key.toLowerCase();
+    var emailMatch=a.email && a.email.toLowerCase()===key.toLowerCase();
+    var phoneMatch=a.phone && a.phone===key;
+    if((usernameMatch||idMatch||emailMatch||phoneMatch)&&a.password===pass){ found=a; break; }
+  }
+  if(!found){ showToast("Invalid Username/ID/Gmail/Phone or password"); return; }
+  currentId=found.id; current=found;
+  var synced=await syncCurrentUserToBackend();
+  if(!synced || !synced.role){ showToast("Server connection required for account login"); return; }
+  current=accounts[currentId];
+  await pullBackendNotifications();
+  localStorage.setItem("lhrCurrent",currentId);
+  openApp();
+  showToast("Login successful");
+}
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+
+function maskRecoveryContact(value, type){
+  value=String(value||"");
+  if(type==="phone") return value.length>=4 ? value.slice(0,3)+"*****"+value.slice(-2) : "your registered phone";
+  var at=value.indexOf("@");
+  if(at>1) return value.slice(0,2)+"***"+value.slice(at);
+  return "your registered email";
+}
+
+function makeOtp(){
+  var n=Math.floor(100000+Math.random()*900000);
+  return String(n);
+}
+
+function findRecoveryAccount(key){
+  var ids=Object.keys(accounts);
+  key=String(key||"").trim().toLowerCase();
+  var normalizedPhone=key.replace(/[^0-9+]/g,"");
+  for(var i=0;i<ids.length;i++){
+    var a=accounts[ids[i]]||{};
+    var patient=(a.data&&a.data.patient)||{};
+    var username=String(a.username || patient.username || "").trim().toLowerCase();
+    var email=String(a.email || patient.email || "").trim().toLowerCase();
+    var phone=String(a.phone || patient.phone || "").replace(/[^0-9+]/g,"");
+    if((username&&username===key) ||
+       (String(a.id||"").toLowerCase()===key) ||
+       (phone&&phone===normalizedPhone) ||
+       (email&&email===key)){
+      if(!a.recoveryCode) a.recoveryCode=makeRecoveryCode();
+      if(!a.email && patient.email) a.email=patient.email;
+      if(!a.phone && patient.phone) a.phone=patient.phone;
+      accounts[a.id]=a;
+      saveAccounts();
+      return a;
+    }
+  }
+  return null;
+}
+
+function verifyRecoveryByOtp(found,type){
+  var contact=type==="phone" ? found.phone : found.email;
+  if(!contact){
+    showToast(type==="phone" ? "No registered phone number found" : "No registered email found");
+    return false;
+  }
+
+  var otp=makeOtp();
+  /* Static-site/demo mode: a real SMS/email provider must replace this step. */
+  alert(
+    "DEMO VERIFICATION CODE\\n\\n"+
+    "A 6-digit code would be sent to "+maskRecoveryContact(contact,type)+".\\n\\n"+
+    "For this static website demo, your code is: "+otp+"\\n\\n"+
+    "In a real deployment, never show the OTP on the website."
+  );
+
+  var entered=prompt("Enter the 6-digit verification code:");
+  if(entered===null) return false;
+  if(String(entered).trim()!==otp){
+    showToast("Invalid verification code");
+    return false;
+  }
+  return true;
+}
+
+function resetPasswordForAccount(found){
+  var newPass=prompt("Enter your new password (minimum 6 characters):");
+  if(newPass===null) return false;
+  if(newPass.length<6){
+    showToast("Password must be at least 6 characters");
+    return false;
+  }
+
+  var confirmNew=prompt("Re-enter your new password:");
+  if(confirmNew===null) return false;
+  if(newPass!==confirmNew){
+    showToast("Passwords do not match");
+    return false;
+  }
+
+  found.password=newPass;
+  /* Give the user a fresh recovery code after a successful reset. */
+  found.recoveryCode=makeRecoveryCode();
+  accounts[found.id]=found;
+  saveAccounts();
+  try{ syncCurrentUserToBackend(); }catch(e){}
+
+  alert(
+    "PASSWORD RESET SUCCESSFUL ✓\\n\\n"+
+    "Your new recovery code is:\\n\\n"+
+    found.recoveryCode+
+    "\\n\\nSave this code somewhere safe."
+  );
+  showToast("Password reset successfully. Please login again.");
+  return true;
+}
+
+function forgotPassword(){
+  loadAccounts();
+
+  var key=prompt(
+    "ACCOUNT RECOVERY\\n\\nEnter your Username, Patient ID, registered phone or Gmail:"
+  );
+  if(key===null) return;
+  if(!key.trim()){
+    showToast("Enter your account information");
+    return;
+  }
+
+  var found=findRecoveryAccount(key);
+  if(!found){
+    showToast("Account not found");
+    return;
+  }
+
+  var phoneText=found.phone ? "1 = SMS/phone verification ("+maskRecoveryContact(found.phone,"phone")+")" : "1 = SMS/phone verification (not available)";
+  var emailText=found.email ? "2 = Email verification ("+maskRecoveryContact(found.email,"email")+")" : "2 = Email verification (not available)";
+  var recoveryText=found.recoveryCode ? "3 = Recovery code" : "3 = Recovery code (not available)";
+
+  var method=prompt(
+    "ACCOUNT RECOVERY\\n\\n"+
+    "Choose a verification method:\\n"+
+    phoneText+"\\n"+
+    emailText+"\\n"+
+    recoveryText+"\\n\\n"+
+    "Enter 1, 2 or 3:"
+  );
+  if(method===null) return;
+  method=method.trim();
+
+  var verified=false;
+  if(method==="1") verified=verifyRecoveryByOtp(found,"phone");
+  else if(method==="2") verified=verifyRecoveryByOtp(found,"email");
+  else if(method==="3"){
+    if(!found.recoveryCode){
+      showToast("This account has no recovery code");
+      return;
+    }
+    var recovery=prompt("Enter your recovery code (format XXXX-XXXX):");
+    if(recovery===null) return;
+    verified=String(recovery).trim().toUpperCase()===found.recoveryCode.toUpperCase();
+    if(!verified) showToast("Invalid recovery code");
+  }else{
+    showToast("Choose 1, 2 or 3");
+    return;
+  }
+
+  if(!verified) return;
+  resetPasswordForAccount(found);
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+  localStorage.removeItem(
+    "lhrCurrent"
+  );
+
+  currentId="";
+  current=null;
+
+  $("app").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+
+  showLogin();
+
+}
+
+
+/* =========================
+   APP
+========================= */
+
+function openApp(){
+
+  // The backend role is authoritative; never derive Super Admin from device-local account order.
+  if(current && accounts[current.id]) accounts[current.id].role=current.role;
+  saveAccounts();
+
+  $("auth").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  $("welcome").textContent=
+    "Welcome, "+current.name;
+
+  loadPatient();
+  loadMedicines();
+  setDates();
+
+  renderAllRecords();
+  updateStats();
+  buildButtons();
+  renderNotifications();
+  updateAdminMenu();
+  updateRoleBadge();
+  var aq=$("adminQuickCard");
+  if(aq){
+    var allowed=!!current && (current.role==="admin" || current.role==="superadmin");
+    aq.classList.toggle("hidden",!allowed);
+    aq.style.display=allowed ? "block" : "none";
+  }
+
+  showHome();
+
+
+  if(current.gender==="Female"){
+
+    $("femaleSections")
+      .classList.remove("hidden");
+
+    loadPeriod();
+    loadPregnancy();
+
+    renderPeriod();
+    renderPreg();
+
+  }else{
+
+    $("femaleSections")
+      .classList.add("hidden");
+
+  }
+
+
+  renderGeneral();
+
+}
+
+
+function toggleMenu(){
+
+  $("menu").classList.toggle("hidden");
+
+}
+
+
+document.addEventListener(
+  "click",
+  function(e){
+
+    var menu=$("menu");
+    var btn=document.querySelector(".menuBtn");
+
+    if(
+      menu &&
+      !menu.classList.contains("hidden") &&
+      e.target!==menu &&
+      !menu.contains(e.target) &&
+      e.target!==btn
+    ){
+
+      menu.classList.add("hidden");
+
+    }
+
+  }
+);
+
+
+function closeMenu(){
+
+  $("menu").classList.add("hidden");
+
+}
+
+
+/* =========================
+   PAGE TRANSITIONS
+========================= */
+
+function pageTransition(){
+
+  var t=$("pageTransition");
+
+  if(!t)return;
+
+  t.classList.add("show");
+
+  setTimeout(function(){
+
+    t.classList.remove("show");
+
+  },220);
+
+}
+
+
+function animatePage(id){
+
+  var el=$(id);
+
+  if(!el)return;
+
+  el.classList.remove("pageSwap");
+
+  void el.offsetWidth;
+
+  el.classList.add("pageSwap");
+
+}
+
+
+function hidePages(){
+
+  if($("notificationPanel")) $("notificationPanel").classList.add("hidden");
+  $("home").classList.add("hidden");
+  $("patientPage").classList.add("hidden");
+  $("profilePage").classList.add("hidden");
+  $("doctorPage").classList.add("hidden");
+  if($("friendsPage")) $("friendsPage").classList.add("hidden");
+  if($("adminPage")) $("adminPage").classList.add("hidden");
+
+}
+
+
+function renderHomeInfo(){
+
+  var el=$("homeAppointmentText");
+  if(!el || !current || !current.data) return;
+
+  var events=current.data.events || [];
+  var today=new Date();
+  today.setHours(0,0,0,0);
+
+  var upcoming=events.filter(function(ev){
+    if(!ev.date) return false;
+    var d=new Date(ev.date+"T00:00:00");
+    return !isNaN(d.getTime()) && d>=today;
+  }).sort(function(a,b){
+    return (a.date||"").localeCompare(b.date||"");
+  }).slice(0,3);
+
+  if(!upcoming.length){
+    el.textContent="আপনার Calendar-এ এখন কোনো upcoming appointment নেই।";
+    return;
+  }
+
+  el.innerHTML=upcoming.map(function(ev){
+    var title=ev.title || ev.name || "Doctor Visit";
+    var date=ev.date || "";
+    var time=ev.time ? " • "+ev.time : "";
+    return "<div style=\"margin:9px 0; padding:10px; border-radius:10px; background:rgba(127,127,127,.08);\"><b>"+title+"</b><br><span>📅 "+date+time+"</span></div>";
+  }).join("");
+
+}
+
+function refreshNotificationUI(){
+  if(!current) return;
+  ensureFriendData(current);
+  var badge=$("notificationBadge");
+  if(!badge) return;
+  var unread=current.notifications.filter(function(n){ return !n.read; }).length;
+  badge.textContent=unread>99?"99+":String(unread);
+  badge.classList.toggle("hidden",unread===0);
+}
+
+
+function showHome(){
+
+  refreshNotificationUI();
+  pageTransition();
+
+  hidePages();
+
+  $("patientPage").classList.remove("sectionPageMode");
+  $("home").classList.remove("hidden");
+
+  closeSections();
+  renderHomeInfo();
+
+  animatePage("home");
+  window.scrollTo({top:0,behavior:"smooth"});
+
+}
+
+
+function showPatient(){
+
+  pageTransition();
+
+  hidePages();
+
+  var patientPage=$("patientPage");
+  patientPage.classList.remove("hidden");
+  patientPage.classList.remove("sectionPageMode");
+
+  closeSections();
+
+  // Always rebuild Patient buttons when Patient is opened.
+  buildButtons();
+
+  if($("patientNav")){
+    $("patientNav").classList.remove("hidden");
+  }
+
+  animatePage("patientPage");
+  window.scrollTo({top:0,behavior:"smooth"});
+
+}
+
+
+function showFriends(){
+
+  pageTransition();
+  hidePages();
+
+  $("friendsPage").classList.remove("hidden");
+  $("friendSearchUsername").value="";
+  $("friendSearchResult").innerHTML="";
+  renderFriendRequests();
+  renderSentFriendRequests();
+  renderFriends();
+
+  animatePage("friendsPage");
+  window.scrollTo({top:0,behavior:"smooth"});
+
+}
+
+function ensureFriendData(account){
+  if(!Array.isArray(account.friends)) account.friends=[];
+  if(!Array.isArray(account.friendRequests)) account.friendRequests=[];
+  if(!Array.isArray(account.notifications)) account.notifications=[];
+}
+
+async function searchFriendByUsername(){
+  var username=$("friendSearchUsername").value.trim().toLowerCase();
+  var out=$("friendSearchResult");
+  if(!username){ out.innerHTML='<div class="notice">Username লিখুন।</div>'; return; }
+  var targetId=null, target=null;
+  var ids=Object.keys(accounts), i;
+  for(i=0;i<ids.length;i++){
+    var a=accounts[ids[i]];
+    var u=(a.username || (a.data && a.data.patient && a.data.patient.username) || "").toLowerCase();
+    if(u===username){ targetId=ids[i]; target=a; break; }
+  }
+  // If the account is on another browser/device, find it through the backend.
+  if(!targetId){
+    try{
+      var r=await fetch('/api/user-search?username='+encodeURIComponent(username));
+      if(r.ok){ var result=await r.json(); if(result && result.user){ target=result.user; targetId=result.user.id; } }
+    }catch(e){ console.warn('Backend user search unavailable',e); }
+  }
+  if(targetId===currentId){ out.innerHTML='<div class="notice">এটি আপনার নিজের username।</div>'; return; }
+  if(!targetId){ out.innerHTML='<div class="notice">❌ এই username-এর কোনো account পাওয়া যায়নি।</div>'; return; }
+  ensureFriendData(current);
+  if(!accounts[targetId]) accounts[targetId]=target;
+  ensureFriendData(accounts[targetId]);
+  target=accounts[targetId];
+  var already=current.friends.indexOf(targetId)!==-1;
+  var pending=target.friendRequests.indexOf(currentId)!==-1;
+  var incoming=current.friendRequests.indexOf(targetId)!==-1;
+  var action='';
+  if(already) action='<span class="sub">✅ Already friends</span>';
+  else if(pending) action='<span class="sub">⏳ Friend request sent</span>';
+  else if(incoming) action='<span class="sub">📩 This user has already sent you a request</span>';
+  else action='<button class="primary" type="button" onclick="sendFriendRequest(&quot;'+escapeHtml(targetId)+'&quot;)">➕ Add Friend</button>';
+  var displayUsername=target.username || (target.data && target.data.patient && target.data.patient.username) || username;
+  out.innerHTML='<div class="card" style="margin:0"><h3>👤 '+escapeHtml(target.name||"User")+'</h3><p><b>Username:</b> @'+escapeHtml(displayUsername)+'</p><p><b>Patient ID:</b> '+escapeHtml(target.id||targetId)+'</p>'+action+'</div>';
+}
+
+async function sendFriendRequest(id){
+  if(!id || id===currentId) return;
+  // Cross-device request: let the backend deliver it to the target account.
+  try{
+    var r=await fetch('/api/friend-request',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fromId:currentId,fromUsername:current.username||'',fromName:current.name||'',toId:id})
+    });
+    if(r.ok){
+      var result=await r.json();
+      if(result.success){ showToast('Friend request sent ✓'); searchFriendByUsername(); renderSentFriendRequests(); return; }
+    }
+  }catch(e){ console.warn('Backend friend request unavailable',e); }
+  // Local fallback for offline/demo use.
+  if(!accounts[id]){ showToast('User account is not available on this device'); return; }
+  ensureFriendData(current); ensureFriendData(accounts[id]);
+  if(current.friends.indexOf(id)!==-1){ showToast('Already friends'); return; }
+  if(accounts[id].friendRequests.indexOf(currentId)===-1){
+    accounts[id].friendRequests.push(currentId);
+    accounts[id].notifications.push({id:'friend_'+Date.now()+'_'+Math.random().toString(36).slice(2),type:'friend',title:'New Friend Request',message:(current.name||'Someone')+' (@'+(current.username||'')+') আপনাকে friend request পাঠিয়েছে।',fromId:currentId,date:new Date().toISOString(),read:false});
+  }
+  saveAccounts(); showToast('Friend request sent ✓'); searchFriendByUsername(); renderSentFriendRequests();
+}
+
+function acceptFriendRequest(id){
+
+  if(!accounts[id]) return;
+  ensureFriendData(current);
+  ensureFriendData(accounts[id]);
+
+  if(current.friends.indexOf(id)===-1) current.friends.push(id);
+  if(accounts[id].friends.indexOf(currentId)===-1) accounts[id].friends.push(currentId);
+
+  current.friendRequests=current.friendRequests.filter(function(x){ return x!==id; });
+  accounts[id].friendRequests=accounts[id].friendRequests.filter(function(x){ return x!==currentId; });
+
+  ensureFriendData(accounts[id]);
+  accounts[id].notifications.push({
+    id:"friend_accept_"+Date.now()+"_"+Math.random().toString(36).slice(2),
+    type:"friend",
+    title:"Friend Request Accepted",
+    message:(current.name||"User")+" আপনার friend request accept করেছে।",
+    fromId:currentId,
+    date:new Date().toISOString(),
+    read:false
+  });
+
+  saveAccounts();
+  renderNotifications();
+  renderFriendRequests();
+  renderFriends();
+  showToast("Friend added ✓");
+}
+
+function renderFriendRequests(){
+
+  ensureFriendData(current);
+  var el=$("friendRequestsList");
+  if(!el) return;
+
+  if(!current.friendRequests.length){
+    el.innerHTML='<p class="sub">কোনো pending friend request নেই।</p>';
+    return;
+  }
+
+  el.innerHTML=current.friendRequests.map(function(id){
+    var a=accounts[id];
+    if(!a) return '';
+    return '<div style="margin:9px 0;padding:12px;border-radius:10px;background:rgba(127,127,127,.08)">'+
+      '<b>'+escapeHtml(a.name||"User")+'</b><br>'+
+      '<span class="sub">'+escapeHtml(a.id||id)+'</span><br><br>'+
+      '<button class="primary" type="button" onclick="acceptFriendRequest(&quot;'+escapeHtml(id)+'&quot;)">✅ Accept</button>'+
+      '</div>';
+  }).join('');
+}
+
+function renderSentFriendRequests(){
+
+  ensureFriendData(current);
+  var el=$("sentFriendRequestsList");
+  if(!el) return;
+
+  var sent=[];
+  var ids=Object.keys(accounts);
+
+  ids.forEach(function(id){
+    if(id===currentId) return;
+    var a=accounts[id];
+    ensureFriendData(a);
+    if(a.friendRequests.indexOf(currentId)!==-1 && current.friends.indexOf(id)===-1){
+      sent.push(id);
+    }
+  });
+
+  if(!sent.length){
+    el.innerHTML='<p class="sub">আপনি এখনো কাউকে friend request পাঠাননি।</p>';
+    return;
+  }
+
+  el.innerHTML=sent.map(function(id){
+    var a=accounts[id];
+    var username=a.username || (a.data && a.data.patient && a.data.patient.username) || "Not set";
+    return '<div style="margin:9px 0;padding:12px;border-radius:10px;background:rgba(127,127,127,.08)">'+
+      '<b>👤 '+escapeHtml(a.name||"User")+'</b><br>'+
+      '<span class="sub">Username: @'+escapeHtml(username)+'</span><br>'+
+      '<span class="sub">⏳ Request pending</span>'+
+      '</div>';
+  }).join('');
+}
+
+
+function toggleMyFriends(){
+
+  var wrap=$("friendsListWrap");
+  if(!wrap) return;
+
+  var opening=wrap.classList.contains("hidden");
+
+  if(opening){
+    wrap.classList.remove("hidden");
+    renderFriends();
+  }else{
+    wrap.classList.add("hidden");
+  }
+
+}
+
+
+function renderFriends(){
+
+  ensureFriendData(current);
+  var el=$("friendsList");
+  if(!el) return;
+
+  if(!current.friends.length){
+    el.innerHTML='<p class="sub">এখনও কোনো friend নেই। Username দিয়ে search করে request পাঠাতে পারেন।</p>';
+    return;
+  }
+
+  el.innerHTML=current.friends.map(function(id){
+    var a=accounts[id];
+    if(!a) return '';
+    return '<div style="margin:9px 0;padding:12px;border-radius:10px;background:rgba(127,127,127,.08)">'+
+      '<b>👤 '+escapeHtml(a.name||"User")+'</b><br>'+
+      '<span class="sub">Username: @'+escapeHtml(a.username || (a.data && a.data.patient && a.data.patient.username) || "Not set")+'</span><br>'+
+      '<span class="sub">Patient ID: '+escapeHtml(a.id||id)+'</span>'+
+      '</div>';
+  }).join('');
+}
+
+
+function ensurePrescriptionData(){
+  if(!current || !current.data) return;
+  if(!Array.isArray(current.data.prescriptions)) current.data.prescriptions=[];
+}
+
+function mergePrescriptionFiles(newFiles){
+  var input=$("rxPhotos"), preview=$("rxPreview"), count=$("rxPhotoCount");
+  if(!input) return;
+  var currentFiles=Array.from(input._files||[]);
+  Array.from(newFiles||[]).forEach(function(f){if(f.type&&f.type.indexOf("image/")===0) currentFiles.push(f);});
+  if(currentFiles.length>10){currentFiles=currentFiles.slice(0,10);showToast("একবারে সর্বোচ্চ 10টি ছবি যোগ করুন");}
+  input._files=currentFiles;
+  if(preview){preview.innerHTML="";currentFiles.forEach(function(file){var img=document.createElement("img");img.className="rxThumb";img.alt="Selected medical photo";img.src=URL.createObjectURL(file);preview.appendChild(img);});}
+  if(count) count.textContent=currentFiles.length?currentFiles.length+"টি ছবি নির্বাচিত হয়েছে।":"কোনো ছবি নির্বাচন করা হয়নি।";
+}
+
+function previewPrescriptionPhotos(){
+  var input=$("rxPhotos");
+  mergePrescriptionFiles(input && input.files ? input.files : []);
+}
+
+function compressPrescriptionImage(file){
+  return new Promise(function(resolve,reject){
+    var reader=new FileReader();
+    reader.onload=function(){var img=new Image();img.onload=function(){var max=1600,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.82));};img.onerror=reject;img.src=reader.result;};
+    reader.onerror=reject;reader.readAsDataURL(file);
+  });
+}
+
+async function savePrescriptionPhotos(){
+  ensurePrescriptionData();var input=$("rxPhotos"),title=$("rxTitle").value.trim()||"Medical Document",date=$("rxDate").value||today();
+  var files=Array.from(input._files||[]).filter(function(f){return f.type&&f.type.indexOf("image/")===0;});
+  if(!files.length){showToast("কমপক্ষে একটি ছবি নির্বাচন করুন");return;} if(files.length>10){showToast("একবারে সর্বোচ্চ 10টি ছবি যোগ করুন");return;}
+  try{var photos=[];for(var i=0;i<files.length;i++)photos.push(await compressPrescriptionImage(files[i]));
+    current.data.prescriptions.unshift({id:"rx_"+Date.now()+"_"+Math.random().toString(36).slice(2),title:title,date:date,photos:photos,createdAt:new Date().toISOString()});
+    saveAccounts();input.value="";input._files=[];$("rxCamera").value="";$("rxGallery").value="";$("rxTitle").value="";$("rxPreview").innerHTML="";$("rxPhotoCount").textContent="কোনো ছবি নির্বাচন করা হয়নি।";renderPrescriptionPhotos();showToast("Photos saved ✓");
+  }catch(e){console.error(e);showToast("ছবি save করা যায়নি");}
+}
+
+function renderPrescriptionPhotos(){
+  ensurePrescriptionData();var box=$("prescriptionList");if(!box)return;var list=current.data.prescriptions||[];
+  if(!list.length){box.innerHTML='<p class="sub">এখনও কোনো prescription বা medical photo save করা হয়নি।</p>';return;}
+  box.innerHTML=list.map(function(item){var thumbs=(item.photos||[]).map(function(src){return '<img class="rxSavedThumb" src="'+src+'" alt="Medical document" onclick="viewPrescriptionPhoto(\''+item.id+'\',\''+src+'\')">';}).join("");return '<div class="rxItem"><div class="top"><div><b>📄 '+escapeHtml(item.title||"Medical Document")+'</b><div class="sub">'+escapeHtml(item.date||"")+' · '+(item.photos||[]).length+' photo(s)</div></div><button type="button" class="secondary" onclick="deletePrescriptionPhotos(\''+item.id+'\')">🗑️ Delete</button></div><div class="rxGallery">'+thumbs+'</div></div>';}).join("");
+}
+
+function viewPrescriptionPhoto(id,src){
+  var old=$("rxViewer");if(old)old.remove();var overlay=document.createElement("div");overlay.id="rxViewer";overlay.className="rxViewer";overlay.innerHTML='<div class="rxViewerInner"><button type="button" class="secondary rxClose" onclick="$(\'rxViewer\').remove()">✕</button><img src="'+src+'" alt="Medical document preview"></div>';overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};document.body.appendChild(overlay);
+}
+
+function deletePrescriptionPhotos(id){ensurePrescriptionData();if(!confirm("এই prescription/photo set-টি delete করবেন?"))return;current.data.prescriptions=current.data.prescriptions.filter(function(x){return x.id!==id;});saveAccounts();renderPrescriptionPhotos();}
+
+function notificationCount(){
+  if(!current) return 0;
+  ensureFriendData(current);
+  return current.notifications.filter(function(n){ return !n.read; }).length;
+}
+
+function renderNotifications(){
+  if(!current) return;
+  ensureFriendData(current);
+  var badge=$("notificationBadge");
+  var list=$("notificationList");
+  if(!badge || !list) return;
+
+  var unread=notificationCount();
+  badge.textContent=unread>99?"99+":String(unread);
+  badge.classList.toggle("hidden",unread===0);
+
+  var notes=current.notifications.slice().sort(function(a,b){
+    return String(b.date||"").localeCompare(String(a.date||""));
+  });
+
+  if(!notes.length){
+    list.innerHTML='<p class="sub" style="padding:12px 0">কোনো notification নেই।</p>';
+    return;
+  }
+
+  list.innerHTML=notes.map(function(n){
+    var icon=n.type==="friend"?"👥":(n.type==="admin"?"📢":"🧑‍⚕️");
+    return '<div class="notificationItem '+(n.read?"":"unread")+'" onclick="openNotification(\"'+escapeHtml(n.id)+'\")">'+
+      '<b>'+icon+' '+escapeHtml(n.title||"Notification")+'</b>'+
+      '<p style="margin:6px 0">'+escapeHtml(n.message||"")+'</p>'+
+      '<span class="sub">'+escapeHtml(n.date?new Date(n.date).toLocaleString():"")+'</span>'+
+      '</div>';
+  }).join("");
+}
+
+function toggleNotifications(){
+  var panel=$("notificationPanel");
+  if(!panel) return;
+  panel.classList.toggle("hidden");
+  if(!panel.classList.contains("hidden")){
+    renderNotifications();
+    pullBackendNotifications();
+  }
+}
+
+async function openNotification(id){
+  ensureFriendData(current);
+  var n=current.notifications.find(function(x){ return x.id===id; });
+  if(n){
+    n.read=true;
+    saveAccounts();
+    try{ await fetch("/api/mark-notification",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:current.id,notificationId:id})}); }catch(e){}
+    renderNotifications(); refreshNotificationUI();
+  }
+}
+
+async function markAllNotificationsRead(){
+  ensureFriendData(current);
+  current.notifications.forEach(function(n){ n.read=true; });
+  saveAccounts();
+  try{ await fetch("/api/mark-notification",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:current.id,all:true})}); }catch(e){}
+  renderNotifications();
+  refreshNotificationUI();
+}
+
+function sendDoctorNotification(){
+  var username=$("doctorNotifyUsername").value.trim().toLowerCase();
+  var title=$("doctorNotifyTitle").value.trim();
+  var message=$("doctorNotifyMessage").value.trim();
+  if(!username || !title || !message){ showToast("Username, title এবং information দিন"); return; }
+
+  var targetId=null;
+  Object.keys(accounts).some(function(id){
+    var a=accounts[id];
+    var u=(a.username || (a.data&&a.data.patient&&a.data.patient.username) || "").toLowerCase();
+    if(u===username){ targetId=id; return true; }
+    return false;
+  });
+
+  if(!targetId){ showToast("এই username-এর patient পাওয়া যায়নি"); return; }
+  ensureFriendData(accounts[targetId]);
+  accounts[targetId].notifications.push({
+    id:"doctor_"+Date.now()+"_"+Math.random().toString(36).slice(2),
+    type:"doctor",
+    title:title,
+    message:message,
+    date:new Date().toISOString(),
+    read:false
+  });
+  saveAccounts();
+  $("doctorNotifyMessage").value="";
+  showToast("Doctor information sent ✓");
+}
+
+function updateRoleBadge(){
+  var b=$("roleBadge");
+  if(!b) return;
+  if(!current){ b.classList.add("hidden"); return; }
+  if(current.role==="superadmin"){
+    b.textContent="👑 Super Admin";
+    b.className="roleBadge super";
+  }else if(current.role==="admin"){
+    b.textContent="🛡️ Admin";
+    b.className="roleBadge admin";
+  }else{
+    b.classList.add("hidden");
+  }
+}
+
+function updateAdminMenu(){
+  var btn=$("adminMenuBtn");
+  if(!btn) return;
+  var allowed=!!current && (current.role==="admin" || current.role==="superadmin");
+  btn.classList.toggle("hidden",!allowed);
+  btn.style.display=allowed ? "block" : "none";
+}
+
+function showAdmin(){
+  if(!isAdmin()){
+    showToast("Admin access required");
+    return;
+  }
+  pageTransition();
+  hidePages();
+  var page=$("adminPage");
+  if(!page) return;
+  page.classList.remove("hidden");
+  page.style.display="block";
+  renderAdminUsers();
+}
+
+function renderAdminUsers(){
+  var el=$("adminUsersList");
+  if(!el || !isAdmin()) return;
+  var ids=Object.keys(accounts);
+  var admins=[];
+  for(var i=0;i<ids.length;i++){
+    var a=accounts[ids[i]];
+    if(a.role==="superadmin" || a.role==="admin") admins.push(a);
+  }
+  if(!admins.length){ el.innerHTML='<p class="sub">No admins yet.</p>'; return; }
+  el.innerHTML=admins.map(function(a){
+    var name=escapeHtml(a.name||a.username||a.id);
+    var u=escapeHtml(a.username||"");
+    var role=a.role==="superadmin"?"Super Admin":"Admin";
+    var action=(a.role==="admin" && isSuperAdmin()) ? '<button class="danger" type="button" onclick="revokeAdmin(\''+escapeHtml(a.id)+'\')">❌ Remove Admin</button>' : '';
+    return '<div class="notificationItem"><b>👤 '+name+'</b><br><span class="sub">@'+u+' • '+role+'</span><div style="margin-top:8px">'+action+'</div></div>';
+  }).join("");
+}
+
+async function promoteAdmin(){
+  if(!isSuperAdmin()){ showToast("Only Super Admin can add admins"); return; }
+  loadAccounts();
+  current=accounts[currentId]||current;
+  var targetId=$("adminPromoteAccountId").value.trim();
+  if(!targetId){ showToast("Account ID দিন"); return; }
+  if(targetId===currentId){ showToast("নিজেকে Admin করা যাবে না"); return; }
+  try{
+    var r=await fetch('/api/promote-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requesterId:currentId,targetId:targetId})});
+    var result=await r.json().catch(function(){return {};});
+    if(r.ok && result.success){
+      if(result.user){ accounts[result.user.id]=Object.assign(accounts[result.user.id]||{},result.user,{role:'admin'}); saveAccounts(); }
+      $("adminPromoteAccountId").value="";
+      renderAdminUsers();
+      showToast("Admin added ✓");
+      return;
+    }
+    showToast(result.error||"এই Account ID-এর account পাওয়া যায়নি");
+  }catch(e){ showToast("Backend unavailable — Admin add করা যায়নি"); }
+}
+
+async function revokeAdmin(id){
+  if(!isSuperAdmin()){ showToast("Only Super Admin can remove admins"); return; }
+  try{
+    var r=await fetch('/api/revoke-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requesterId:currentId,targetId:id})});
+    var result=await r.json().catch(function(){return {};});
+    if(r.ok && result.success){
+      if(accounts[id]) accounts[id].role='user';
+      saveAccounts(); renderAdminUsers(); showToast("Admin permission removed ✓"); return;
+    }
+    showToast(result.error||"Could not remove admin");
+  }catch(e){ showToast("Backend unavailable"); }
+}
+
+async function sendAdminNotice(){
+  if(!isAdmin()){ showToast("Admin access required"); return; }
+  loadAccounts();
+  current=accounts[currentId]||current;
+  var title=$("adminNoticeTitle").value.trim();
+  var message=$("adminNoticeMessage").value.trim();
+  if(!title || !message){ showToast("Title and notice লিখুন"); return; }
+
+  try{
+    var response=await fetch("/api/admin-notice",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        senderId:current.id,
+        senderUsername:current.username||current.name||"Admin",
+        title:title,
+        message:message
+      })
+    });
+    var result=await response.json().catch(function(){return {};});
+    if(response.ok && result.success){
+      $("adminNoticeTitle").value="";
+      $("adminNoticeMessage").value="";
+      await pullBackendNotifications();
+      renderAdminNoticeHistory();
+      showToast("Notice sent to all registered users ✓");
+      return;
+    }
+  }catch(e){ console.warn("Backend notice unavailable",e); }
+
+  // Fallback for offline/static demo mode.
+  var notice={
+    id:"admin_"+Date.now()+"_"+Math.random().toString(36).slice(2),
+    type:"admin", title:title, message:message, date:new Date().toISOString(),
+    read:false, sender:current.username||current.name||"Admin"
+  };
+  var ids=Object.keys(accounts);
+  for(var i=0;i<ids.length;i++){
+    ensureFriendData(accounts[ids[i]]);
+    accounts[ids[i]].notifications.push(Object.assign({},notice,{read:ids[i]===currentId}));
+  }
+  saveAccounts();
+  current=accounts[currentId];
+  $("adminNoticeTitle").value="";
+  $("adminNoticeMessage").value="";
+  renderAdminNoticeHistory();
+  refreshNotificationUI();
+  showToast("Notice saved locally (backend unavailable)");
+}
+
+function renderAdminNoticeHistory(){
+  var el=$("adminNoticeHistory");
+  if(!el || !isAdmin()) return;
+  var seen={};
+  var list=[];
+  var ids=Object.keys(accounts);
+  for(var i=0;i<ids.length;i++){
+    var ns=accounts[ids[i]].notifications||[];
+    for(var j=0;j<ns.length;j++){
+      var n=ns[j];
+      if(n.type==="admin" && !seen[n.id]){ seen[n.id]=true; list.push(n); }
+    }
+  }
+  list.sort(function(a,b){ return String(b.date||"").localeCompare(String(a.date||"")); });
+  if(!list.length){ el.innerHTML='<p class="sub">No notices sent yet.</p>'; return; }
+  el.innerHTML=list.slice(0,20).map(function(n){
+    return '<div class="notificationItem"><b>📢 '+escapeHtml(n.title||"Notice")+'</b><p style="margin:6px 0">'+escapeHtml(n.message||"")+'</p><span class="sub">'+escapeHtml(n.date?new Date(n.date).toLocaleString():"")+'</span></div>';
+  }).join("");
+}
+
+async function deleteMyAccount(){
+  if(!current || !current.id) return;
+  var ok=confirm("আপনি কি সত্যিই আপনার account এবং এই account-এর সব health data delete করতে চান? এই কাজটি undo করা যাবে না।");
+  if(!ok) return;
+  var typed=prompt("নিশ্চিত করতে আপনার username লিখুন: "+(current.username||""));
+  if(typed===null || String(typed).trim().toLowerCase()!==(current.username||"").toLowerCase()){
+    showToast("Account delete বাতিল হয়েছে");
+    return;
+  }
+  try{
+    var r=await fetch("/api/delete-account",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:current.id,username:current.username})
+    });
+    if(!r.ok){
+      var er=await r.json().catch(function(){return {};});
+      showToast(er.error||"Account delete করা যায়নি");
+      return;
+    }
+  }catch(e){
+    // Local account can still be removed if backend is unavailable.
+    console.warn("Backend account delete unavailable",e);
+  }
+  delete accounts[current.id];
+  saveAccounts();
+  localStorage.removeItem("lhrCurrent");
+  currentId="";
+  current=null;
+  $("app").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+  showLogin();
+  showToast("Account permanently deleted ✓");
+}
+
+function showProfile(){
+
+  pageTransition();
+
+  hidePages();
+  $("patientPage").classList.remove("sectionPageMode");
+
+  $("profilePage").classList.remove("hidden");
+
+  $("profileEdit").classList.add("hidden");
+  $("profileView").classList.remove("hidden");
+
+  renderProfile();
+
+  animatePage("profilePage");
+
+}
+
+
+function showDoctor(){
+
+  pageTransition();
+
+  hidePages();
+  $("patientPage").classList.remove("sectionPageMode");
+
+  $("doctorPage").classList.remove("hidden");
+
+  animatePage("doctorPage");
+
+}
+
+
+function closeSections(){
+
+  var a=document.querySelectorAll(".section");
+  var i;
+
+  for(i=0;i<a.length;i++){
+    a[i].classList.remove("open");
+  }
+
+}
+
+
+function openSection(id){
+
+  pageTransition();
+
+  hidePages();
+
+  var patientPage=$("patientPage");
+  patientPage.classList.remove("hidden");
+  patientPage.classList.add("sectionPageMode");
+
+  closeSections();
+
+  if($("patientNav")){
+    $("patientNav").classList.add("hidden");
+  }
+
+  var section=$(id);
+  if(!section){
+    return;
+  }
+
+  /* Add one navigation button to the page itself.
+     No other health buttons are shown here. */
+  if(!section.querySelector(".sectionBack")){
+    var back=document.createElement("button");
+    back.type="button";
+    back.className="secondary sectionBack";
+    back.textContent="← Health Center";
+    back.onclick=function(){ showPatient(); };
+    section.insertBefore(back,section.firstChild);
+  }
+
+  section.classList.add("open");
+
+  animatePage(id);
+
+  window.scrollTo({top:0,behavior:"smooth"});
+
+  if(id==="secCalendar"){
+    renderGeneral();
+  }
+
+  if(id==="secPeriod"){
+    renderPeriod();
+  }
+
+  if(id==="secPreg"){
+    renderPreg();
+  }
+
+  if(id==="secPrescriptions"){
+    ensurePrescriptionData();
+    renderPrescriptionPhotos();
+  }
+
+}
+
+
+/* =========================
+   DASHBOARD BUTTONS
+========================= */
+
+function buildButtons(){
+
+  var box=$("dashboard");
+  var box2=$("dashboard2");
+  if(!box && !box2) return;
+
+  var items=[
+    ["secPatient","👤","Patient Information"],
+    ["secMedicine","💊","Medicine / Medication"],
+    ["secBP","❤️","Blood Pressure"],
+    ["secGlucose","🩺","Diabetes / Glucose"],
+    ["secEye","👁️","Eye Examination"],
+    ["secDental","🦷","Dental Examination"],
+    ["secDonation","🩸","Blood Donation"],
+    ["secCalendar","📅","Health / Appointment Calendar"],
+    ["secPrescriptions","📸","Prescription & Medical Photos"]
+  ];
+
+  if(current && current.gender==="Female"){
+    items.push(["secPeriod","🩸","Last Period Tracker"]);
+    items.push(["secPreg","🤰","Pregnancy Report & Calendar"]);
+  }
+
+  if(box) box.innerHTML="";
+  if(box2) box2.innerHTML="";
+
+  items.forEach(function(item){
+    var b=document.createElement("button");
+    b.type="button";
+    b.className="dashBtn";
+    b.onclick=function(){ openSection(item[0]); };
+    b.innerHTML="<strong>"+item[1]+" "+item[2]+"</strong><span>Open</span>";
+    if(box) box.appendChild(b);
+  });
+
+  // Keep a second copy for the home dashboard, but never duplicate
+  // Patient-page buttons inside each other.
+  if(box2){
+    items.forEach(function(item){
+      var b=document.createElement("button");
+      b.type="button";
+      b.className="dashBtn";
+      b.onclick=function(){ openSection(item[0]); };
+      b.innerHTML="<strong>"+item[1]+" "+item[2]+"</strong><span>Open</span>";
+      box2.appendChild(b);
+    });
+  }
+}
+
+
+/* =========================
+   PATIENT
+========================= */
+
+function loadPatient(){
+
+  var p=current.data.patient;
+
+  $("pId").value=p.id;
+  $("pName").value=p.name;
+  $("pAge").value=p.age;
+  $("pGender").value=p.gender;
+  $("pDob").value=p.dob;
+  $("pBlood").value=p.blood;
+  $("pPhone").value=p.phone;
+  $("pEmail").value=p.email;
+  $("pAddress").value=p.address;
+  $("pEmergency").value=p.emergency;
+
+}
+
+
+function savePatient(){
+
+  var p=current.data.patient;
+
+  var newPhone=
+    $("pPhone").value.trim();
+
+
+  if(!/^01[3-9]\d{8}$/.test(newPhone)){
+
+    showToast(
+      "Enter a valid Bangladesh mobile number"
+    );
+
+    return;
+
+  }
+
+
+  p.name=$("pName").value;
+  p.age=$("pAge").value;
+  p.dob=$("pDob").value;
+  p.blood=$("pBlood").value;
+  p.phone=newPhone;
+  p.email=$("pEmail").value;
+  p.address=$("pAddress").value;
+  p.emergency=$("pEmergency").value;
+
+
+  current.username=p.username;
+  current.name=p.name;
+  current.phone=p.phone;
+  current.email=p.email;
+  current.gender=p.gender;
+
+
+  saveCurrent();
+
+  $("welcome").textContent=
+    "Welcome, "+current.name;
+
+  renderProfile();
+
+  showToast(
+    "Patient information saved"
+  );
+
+}
+
+
+function saveCurrent(){
+
+
+
+  accounts[currentId]=current;
+
+  saveAccounts();
+
+}
+
+
+/* =========================
+   MEDICINE
+========================= */
+
+function addMedicine(){
+
+  var box=document.createElement("div");
+
+  box.className="med";
+
+
+  box.innerHTML=
+
+  '<div class="medtitle">💊 Medicine</div>'+
+
+  '<div class="medgrid">'+
+
+  '<div>'+
+  '<label>Medicine Name</label>'+
+  '<input class="mn">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>Times Per Day</label>'+
+  '<input class="mt" type="number" min="1">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>Timing</label>'+
+  '<input class="mti" placeholder="Morning / Afternoon / Night">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>Dose / Amount</label>'+
+  '<input class="md" placeholder="Example: 1 tablet">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>Before / After Food</label>'+
+  '<select class="mf">'+
+  '<option value="">Select</option>'+
+  '<option>Before Food</option>'+
+  '<option>After Food</option>'+
+  '<option>With Food</option>'+
+  '<option>Any Time</option>'+
+  '</select>'+
+  '</div>'+
+
+  '<div>'+
+  '<label>How Many Days</label>'+
+  '<input class="mday" type="number" min="1">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>Start Date</label>'+
+  '<input class="ms" type="date">'+
+  '</div>'+
+
+  '<div>'+
+  '<label>End Date</label>'+
+  '<input class="me" type="date">'+
+  '</div>'+
+
+  '<div class="full">'+
+  '<label>Doctor Instructions / Notes</label>'+
+  '<textarea class="mnote"></textarea>'+
+  '</div>'+
+
+  '</div>'+
+
+  '<div class="take">'+
+
+  '<input class="check" type="checkbox" onchange="medicineChanged(this)">'+
+
+  '<b>☑️ Medicine Taken</b>'+
+
+  '<span class="status">'+
+  '<span class="badge wait">Pending</span>'+
+  '</span>'+
+
+  '</div>'+
+
+  '<button class="danger" onclick="deleteMedicine(this)">🗑️ Delete</button>';
+
+
+  $("medList").appendChild(box);
+
+}
+
+
+function medicineChanged(input){
+
+  var box=input.closest(".med");
+
+  var status=box.querySelector(".status");
+
+
+  if(input.checked){
+
+    status.innerHTML=
+      '<span class="badge ok">Taken ✓</span>';
+
+  }else{
+
+    status.innerHTML=
+      '<span class="badge wait">Pending</span>';
+
+  }
+
+
+  saveMedicines();
+
+}
+
+
+function deleteMedicine(button){
+
+  var box=button.closest(".med");
+
+  if(box){
+
+    box.remove();
+
+    saveMedicines();
+
+    showToast(
+      "Medicine deleted"
+    );
+
+  }
+
+}
+
+
+function saveMedicines(){
+
+  var a=$("medList").querySelectorAll(".med");
+
+  var list=[];
+  var i,b;
+
+
+  for(i=0;i<a.length;i++){
+
+    b=a[i];
+
+    list.push({
+
+      name:b.querySelector(".mn").value,
+
+      times:b.querySelector(".mt").value,
+
+      timing:b.querySelector(".mti").value,
+
+      dose:b.querySelector(".md").value,
+
+      food:b.querySelector(".mf").value,
+
+      days:b.querySelector(".mday").value,
+
+      start:b.querySelector(".ms").value,
+
+      end:b.querySelector(".me").value,
+
+      note:b.querySelector(".mnote").value,
+
+      taken:b.querySelector(".check").checked
+
+    });
+
+  }
+
+
+  current.data.medicines=list;
+
+  saveCurrent();
+
+  updateStats();
+
+}
+
+
+function loadMedicines(){
+
+  var box=$("medList");
+
+  box.innerHTML="";
+
+
+  var i,m,b;
+
+
+  for(
+    i=0;
+    i<current.data.medicines.length;
+    i++
+  ){
+
+    m=current.data.medicines[i];
+
+    addMedicine();
+
+    b=box.lastElementChild;
+
+
+    b.querySelector(".mn").value=m.name||"";
+    b.querySelector(".mt").value=m.times||"";
+    b.querySelector(".mti").value=m.timing||"";
+    b.querySelector(".md").value=m.dose||"";
+    b.querySelector(".mf").value=m.food||"";
+    b.querySelector(".mday").value=m.days||"";
+    b.querySelector(".ms").value=m.start||"";
+    b.querySelector(".me").value=m.end||"";
+    b.querySelector(".mnote").value=m.note||"";
+
+    b.querySelector(".check").checked=!!m.taken;
+
+
+    if(m.taken){
+
+      b.querySelector(".status").innerHTML=
+        '<span class="badge ok">Taken ✓</span>';
+
+    }
+
+  }
+
+}
+
+
+/* =========================
+   HEALTH RECORDS
+========================= */
+
+function saveBP(){
+
+  current.data.bp.push({
+
+    date:$("bpDate").value,
+    time:$("bpTime").value,
+    sys:$("bpSys").value,
+    dia:$("bpDia").value,
+    note:$("bpNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+
+  showToast(
+    "BP record saved"
+  );
+
+}
+
+
+function saveGlucose(){
+
+  current.data.glucose.push({
+
+    date:$("gDate").value,
+    time:$("gTime").value,
+    value:$("gValue").value,
+    type:$("gType").value,
+    note:$("gNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+
+  showToast(
+    "Glucose record saved"
+  );
+
+}
+
+
+function saveEye(){
+
+  current.data.eye.push({
+
+    date:$("eDate").value,
+    right:$("eRight").value,
+    left:$("eLeft").value,
+    pressure:$("ePressure").value,
+    note:$("eNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+
+  showToast(
+    "Eye record saved"
+  );
+
+}
+
+
+function saveDental(){
+
+  current.data.dental.push({
+
+    date:$("dDate").value,
+    condition:$("dCondition").value,
+    treatment:$("dTreatment").value,
+    next:$("dNext").value,
+    note:$("dNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+
+  showToast(
+    "Dental record saved"
+  );
+
+}
+
+
+function saveDonation(){
+
+  current.data.donation.push({
+
+    date:$("donDate").value,
+    blood:$("donBlood").value,
+    center:$("donCenter").value,
+    units:$("donUnits").value,
+    note:$("donNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+
+  showToast(
+    "Donation record saved"
+  );
+
+}
+
+
+function saveEvent(){
+
+  current.data.events.push({
+
+    date:$("evDate").value,
+    time:$("evTime").value,
+    type:$("evType").value,
+    title:$("evTitle").value,
+    note:$("evNote").value
+
+  });
+
+  saveCurrent();
+
+  renderAllRecords();
+  updateStats();
+  renderGeneral();
+
+  showToast(
+    "Calendar event added"
+  );
+
+}
+
+
+/* =========================
+   RECORD RENDER
+========================= */
+
+function renderRecords(id,arr,type){
+
+  var box=$(id);
+
+  box.innerHTML="";
+
+  var i,r,d,text;
+
+
+  for(
+    i=arr.length-1;
+    i>=0;
+    i--
+  ){
+
+    r=arr[i];
+
+    d=document.createElement("div");
+
+    d.className="record";
+
+    text="";
+
+
+    if(type==="bp"){
+
+      text=
+        "📅 "+
+        r.date+
+        " | BP "+
+        r.sys+
+        "/"+
+        r.dia;
+
+    }
+
+
+    if(type==="g"){
+
+      text=
+        "📅 "+
+        r.date+
+        " | Glucose "+
+        r.value+
+        " | "+
+        r.type;
+
+    }
+
+
+    if(type==="e"){
+
+      text=
+        "📅 "+
+        r.date+
+        " | Right "+
+        r.right+
+        " | Left "+
+        r.left;
+
+    }
+
+
+    if(type==="d"){
+
+      text=
+        "📅 "+
+        r.date+
+        " | "+
+        r.condition+
+        " | "+
+        r.treatment;
+
+    }
+
+
+    if(type==="don"){
+
+      text=
+        "🩸 "+
+        r.date+
+        " | "+
+        r.blood+
+        " | "+
+        r.units+
+        " unit(s)";
+
+    }
+
+
+    if(type==="ev"){
+
+      text=
+        "📅 "+
+        r.date+
+        " "+
+        r.time+
+        " | "+
+        r.title;
+
+    }
+
+
+    d.textContent=text;
+
+    box.appendChild(d);
+
+  }
+
+}
+
+
+function renderAllRecords(){
+
+  renderRecords(
+    "bpRecords",
+    current.data.bp,
+    "bp"
+  );
+
+  renderRecords(
+    "gRecords",
+    current.data.glucose,
+    "g"
+  );
+
+  renderRecords(
+    "eRecords",
+    current.data.eye,
+    "e"
+  );
+
+  renderRecords(
+    "dRecords",
+    current.data.dental,
+    "d"
+  );
+
+  renderRecords(
+    "donRecords",
+    current.data.donation,
+    "don"
+  );
+
+  renderRecords(
+    "evRecords",
+    current.data.events,
+    "ev"
+  );
+
+}
+
+
+function updateStats(){
+
+  var i;
+  var taken=0;
+
+
+  for(
+    i=0;
+    i<current.data.medicines.length;
+    i++
+  ){
+
+    if(
+      current.data.medicines[i].taken
+    ){
+      taken++;
+    }
+
+  }
+
+
+  $("statMed").textContent=
+    current.data.medicines.length;
+
+  $("statTaken").textContent=
+    taken;
+
+  $("statEvents").textContent=
+    current.data.events.length;
+
+  $("statRecords").textContent=
+    current.data.bp.length+
+    current.data.glucose.length+
+    current.data.eye.length+
+    current.data.dental.length+
+    current.data.donation.length;
+
+}
+
+
+/* =========================
+   DATES
+========================= */
+
+function setDates(){
+
+  var ids=[
+    "bpDate",
+    "gDate",
+    "eDate",
+    "dDate",
+    "donDate",
+    "evDate",
+    "rxDate"
+  ];
+
+  var i;
+
+  for(i=0;i<ids.length;i++){
+
+    $(ids[i]).value=today();
+
+  }
+
+}
+
+
+/* =========================
+   CALENDAR
+========================= */
+
+function drawCalendar(
+  date,
+  boxId,
+  titleId,
+  mode
+){
+
+  $(titleId).textContent=
+    date.toLocaleString(
+      "default",
+      {
+        month:"long",
+        year:"numeric"
+      }
+    );
+
+
+  var box=$(boxId);
+
+  box.innerHTML="";
+
+
+  var y=date.getFullYear();
+  var m=date.getMonth();
+
+  var first=
+    new Date(y,m,1).getDay();
+
+  var total=
+    new Date(y,m+1,0).getDate();
+
+  var i,d,cell,s;
+
+
+  for(i=0;i<first;i++){
+
+    cell=document.createElement("div");
+
+    cell.className="day";
+
+    cell.style.visibility="hidden";
+
+    box.appendChild(cell);
+
+  }
+
+
+  for(
+    d=1;
+    d<=total;
+    d++
+  ){
+
+    cell=document.createElement("div");
+
+    cell.className="day";
+
+
+    s=
+      y+
+      "-"+
+      String(m+1).padStart(2,"0")+
+      "-"+
+      String(d).padStart(2,"0");
+
+
+    cell.textContent=d;
+
+
+    if(s===today()){
+
+      cell.classList.add("today");
+
+    }
+
+
+    if(mode==="general"){
+
+      for(
+        i=0;
+        i<current.data.events.length;
+        i++
+      ){
+
+        if(
+          current.data.events[i].date===s
+        ){
+
+          cell.classList.add("eventday");
+
+        }
+
+      }
+
+    }
+
+
+    if(mode==="period"){
+
+      var p=current.data.period;
+
+
+      if(p.lmp){
+
+        var diff=Math.floor(
+
+          (
+            new Date(
+              s+"T00:00:00"
+            )-
+
+            new Date(
+              p.lmp+"T00:00:00"
+            )
+
+          )/86400000
+
+        );
+
+
+        var cy=
+          Number(p.cycle||28);
+
+        var du=
+          Number(p.duration||5);
+
+
+        if(
+          diff>=0 &&
+          diff%cy<du
+        ){
+
+          cell.classList.add(
+            "periodday"
+          );
+
+        }
+
+      }
+
+    }
+
+
+    if(mode==="preg"){
+
+      var q=current.data.pregnancy;
+
+
+      if(
+        q.status==="Yes" &&
+        q.lmp &&
+        q.due &&
+        s>=q.lmp &&
+        s<=q.due
+      ){
+
+        cell.classList.add(
+          "pregday"
+        );
+
+      }
+
+    }
+
+
+    box.appendChild(cell);
+
+  }
+
+}
+
+
+function renderGeneral(){
+
+  drawCalendar(
+    generalDate,
+    "generalDays",
+    "generalTitle",
+    "general"
+  );
+
+}
+
+
+function moveGeneral(n){
+
+  generalDate.setMonth(
+    generalDate.getMonth()+n
+  );
+
+  renderGeneral();
+
+}
+
+
+function renderPeriod(){
+
+  drawCalendar(
+    periodDate,
+    "periodDays",
+    "periodTitle",
+    "period"
+  );
+
+}
+
+
+function movePeriod(n){
+
+  periodDate.setMonth(
+    periodDate.getMonth()+n
+  );
+
+  renderPeriod();
+
+}
+
+
+function renderPreg(){
+
+  drawCalendar(
+    pregDate,
+    "pregDays",
+    "pregTitle",
+    "preg"
+  );
+
+}
+
+
+function movePreg(n){
+
+  pregDate.setMonth(
+    pregDate.getMonth()+n
+  );
+
+  renderPreg();
+
+}
+
+
+/* =========================
+   PERIOD
+========================= */
+
+function calcPeriod(){
+
+  var s=$("lmp").value;
+
+
+  if(s){
+
+    $("nextPeriod").value=
+      addDays(
+        s,
+        Number($("cycle").value||28)
+      );
+
+  }else{
+
+    $("nextPeriod").value="";
+
+  }
+
+
+  renderPeriod();
+
+}
+
+
+function savePeriod(){
+
+  current.data.period={
+
+    lmp:$("lmp").value,
+    cycle:$("cycle").value,
+    next:$("nextPeriod").value,
+    duration:$("periodDuration").value
+
+  };
+
+
+  saveCurrent();
+
+  renderPeriod();
+
+  showToast(
+    "Period record saved"
+  );
+
+}
+
+
+function loadPeriod(){
+
+  var p=current.data.period;
+
+  $("lmp").value=p.lmp||"";
+  $("cycle").value=p.cycle||28;
+  $("nextPeriod").value=p.next||"";
+  $("periodDuration").value=p.duration||5;
+
+}
+
+
+/* =========================
+   PREGNANCY
+========================= */
+
+function calcDue(){
+
+  var s=$("pregLmp").value;
+
+
+  if(s){
+
+    $("due").value=
+      addDays(s,280);
+
+  }else{
+
+    $("due").value="";
+
+  }
+
+
+  renderPreg();
+
+}
+
+
+function savePregnancy(){
+
+  current.data.pregnancy={
+
+    status:$("pregStatus").value,
+    test:$("pregTest").value,
+    week:$("pregWeek").value,
+    due:$("due").value,
+    lmp:$("pregLmp").value,
+    note:$("pregNote").value
+
+  };
+
+
+  saveCurrent();
+
+  renderPreg();
+
+  showToast(
+    "Pregnancy record saved"
+  );
+
+}
+
+
+function loadPregnancy(){
+
+  var p=current.data.pregnancy;
+
+  $("pregStatus").value=
+    p.status||"No";
+
+  $("pregTest").value=
+    p.test||"";
+
+  $("pregWeek").value=
+    p.week||"";
+
+  $("due").value=
+    p.due||"";
+
+  $("pregLmp").value=
+    p.lmp||"";
+
+  $("pregNote").value=
+    p.note||"";
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+function renderProfile(){
+
+  var p=current.data.patient;
+
+  renderProfileAvatar("profileAvatar", p.photo);
+
+  $("profileBox").innerHTML=
+
+    '<div>'+
+    '<b>Patient ID</b>'+
+    escapeHtml(p.id)+
+    '</div>'+
+
+    '<div>'+
+    '<b>Username</b>'+
+    escapeHtml(p.username||current.username||"Not set")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Name</b>'+
+    escapeHtml(p.name)+
+    '</div>'+
+
+    '<div>'+
+    '<b>Gender</b>'+
+    escapeHtml(p.gender)+
+    '</div>'+
+
+    '<div>'+
+    '<b>Phone</b>'+
+    escapeHtml(p.phone||"Not added")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Gmail / Email</b>'+
+    escapeHtml(p.email||"Not added")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Age</b>'+
+    escapeHtml(p.age||"Not added")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Blood Group</b>'+
+    escapeHtml(p.blood||"Not added")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Address</b>'+
+    escapeHtml(p.address||"Not added")+
+    '</div>'+
+
+    '<div>'+
+    '<b>Emergency Contact</b>'+
+    escapeHtml(p.emergency||"Not added")+
+    '</div>';
+
+}
+
+
+function editProfile(){
+
+  var p=current.data.patient;
+
+  $("editId").value=p.id||current.id||"";
+  $("editUsername").value=p.username||current.username||"";
+  $("editName").value=p.name||"";
+  $("editAge").value=p.age||"";
+  $("editGender").value=p.gender||current.gender||"Male";
+  $("editDob").value=p.dob||"";
+  $("editBlood").value=p.blood||"";
+  $("editPhone").value=p.phone||current.phone||"";
+  $("editEmail").value=p.email||current.email||"";
+  $("editAddress").value=p.address||"";
+  $("editEmergency").value=p.emergency||"";
+  $("editPhoto").value="";
+  renderProfileAvatar("editProfileAvatar", p.photo);
+
+  $("profileView").classList.add("hidden");
+  $("profileEdit").classList.remove("hidden");
+  animatePage("profileEdit");
+}
+
+function cancelProfileEdit(){
+  $("profileEdit").classList.add("hidden");
+  $("profileView").classList.remove("hidden");
+  renderProfile();
+  animatePage("profileView");
+}
+
+function renderProfileAvatar(targetId, photo){
+  var el=$(targetId);
+  if(!el) return;
+  if(photo){
+    el.innerHTML='<img class="profileAvatar" src="'+photo+'" alt="Profile photo">';
+  }else{
+    el.innerHTML='<div class="profileAvatar profileAvatarPlaceholder">👤</div>';
+  }
+}
+
+function resizeProfileImage(file, callback){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var max=500;
+      var scale=Math.min(1, max/Math.max(img.width,img.height));
+      var w=Math.max(1, Math.round(img.width*scale));
+      var h=Math.max(1, Math.round(img.height*scale));
+      var canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      var ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/jpeg',0.82));
+    };
+    img.onerror=function(){ showToast('Could not read the image'); };
+    img.src=e.target.result;
+  };
+  reader.onerror=function(){ showToast('Could not read the photo'); };
+  reader.readAsDataURL(file);
+}
+
+function previewProfilePhoto(event){
+  var file=event.target.files && event.target.files[0];
+  if(!file) return;
+  if(!file.type || file.type.indexOf('image/')!==0){
+    showToast('Please select an image');
+    event.target.value='';
+    return;
+  }
+  resizeProfileImage(file,function(dataUrl){
+    current.data.patient.photo=dataUrl;
+    renderProfileAvatar('editProfileAvatar',dataUrl);
+  });
+}
+
+function removeProfilePhoto(){
+  current.data.patient.photo='';
+  $("editPhoto").value="";
+  renderProfileAvatar('editProfileAvatar','');
+}
+
+function saveProfileEdit(){
+
+  var p=current.data.patient;
+  var newUsername=$("editUsername").value.trim().toLowerCase();
+  var newName=$("editName").value.trim();
+  var newPhone=$("editPhone").value.trim();
+  var newEmail=$("editEmail").value.trim().toLowerCase();
+  var newGender=$("editGender").value;
+
+  if(!newUsername){
+    showToast("Username is required");
+    return;
+  }
+
+  if(!/^[a-z0-9_]{3,20}$/.test(newUsername)){
+    showToast("Username: 3-20 chars, letters, numbers or _ only");
+    return;
+  }
+
+  if(!newName){
+    showToast("Name is required");
+    return;
+  }
+
+  if(!/^01[3-9]\d{8}$/.test(newPhone)){
+    showToast("Enter a valid Bangladesh mobile number");
+    return;
+  }
+
+  if(newEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){
+    showToast("Enter a valid email address");
+    return;
+  }
+
+  var ids=Object.keys(accounts);
+  var i;
+
+  for(i=0;i<ids.length;i++){
+    var a=accounts[ids[i]];
+    var existingUsername=(a.username || (a.data && a.data.patient && a.data.patient.username) || "").toLowerCase();
+
+    if(a.id!==currentId && existingUsername===newUsername){
+      showToast("This username is already taken");
+      return;
+    }
+
+    if(a.id!==currentId && a.phone===newPhone){
+      showToast("This phone number is already registered");
+      return;
+    }
+
+    if(a.id!==currentId && newEmail && a.email===newEmail){
+      showToast("This Gmail/email is already registered");
+      return;
+    }
+  }
+
+  p.username=newUsername;
+  p.name=newName;
+  p.age=$("editAge").value.trim();
+  p.gender=newGender;
+  p.dob=$("editDob").value;
+  p.blood=$("editBlood").value;
+  p.phone=newPhone;
+  p.email=newEmail;
+  p.address=$("editAddress").value.trim();
+  p.emergency=$("editEmergency").value.trim();
+
+  current.name=p.name;
+  current.phone=p.phone;
+  current.email=p.email;
+  current.gender=p.gender;
+
+  saveCurrent();
+
+  $("welcome").textContent="Welcome, "+current.name;
+
+  $("profileEdit").classList.add("hidden");
+  $("profileView").classList.remove("hidden");
+
+  if(current.gender==="Female"){
+    $("femaleSections").classList.remove("hidden");
+  }else{
+    $("femaleSections").classList.add("hidden");
+  }
+
+  buildButtons();
+  renderProfile();
+  showToast("Profile updated successfully ✓");
+}
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+function start(){
+
+  loadAccounts();
+
+  var saved=
+    localStorage.getItem(
+      "lhrCurrent"
+    );
+
+
+  if(
+    saved &&
+    accounts[saved]
+  ){
+
+    currentId=saved;
+
+    current=accounts[saved];
+
+    openApp();
+
+  }else{
+
+    showLogin();
+
+  }
+
+}
+
+
+start();
+
+
+setTimeout(function(){
+
+  var loader=
+    document.getElementById(
+      "pageLoader"
+    );
+
+
+  if(loader){
+
+    loader.style.opacity="0";
+
+
+    setTimeout(function(){
+
+      loader.remove();
+
+    },260);
+
+  }
+
+},180);
+
+</script>
+
+</body>
+</html>
